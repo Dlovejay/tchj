@@ -3,6 +3,7 @@
 class MY_Controller extends CI_Controller
 {
     private $userLogin=false;    //标志用户登录状态
+    protected $limit = 3;      //分页每页显示条数
     //ajax返回的错误标志 403权限问题 401客户端数据问题 440未登录 500服务端错误...
 
     public function __construct(){

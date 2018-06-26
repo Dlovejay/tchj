@@ -25,7 +25,10 @@ class Page extends MY_Controller{
 	
 	//默认页面
 	public function index(){
-		$data['user'] = $this->session->userdata('user_info');;
+		$data = array(
+			'user' => $this->session->userdata('user_info'),
+			'base_url' => $this->config->item('base_url')
+		);
 		$this->load->view('pages/main.php',$data);
 
 	}
