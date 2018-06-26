@@ -15,7 +15,7 @@ class MY_Controller extends CI_Controller
     {
         $user_info = $this->session->userdata('user_info');
         if (empty($user_info)){
-            redirect(base_url('Page/index'));
+            redirect(base_url('login/index'));
         }
     }
 }

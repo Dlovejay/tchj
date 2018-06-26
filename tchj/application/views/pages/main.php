@@ -20,7 +20,7 @@
 				<span class="userType"><?php echo $user['tname']; ?></span>
 			</div>
 			<div class="userMenu"><a class="rexButton sBlk" id="myaccount" href="<?php echo $config['URLSTR'] . 'pages/account/edit'; ?>" target="contentshow">我的账户</a></div>
-			<div class="userMenu"><a class="rexButton sBlk" href="<?php echo $config['URLSTR'] . 'pages/loginout'; ?>">退出登录</a></div>
+			<div class="userMenu"><a class="rexButton sBlk" href="loginout">退出登录</a></div>
 		</div>
   </div>
   <nav class="rexLeftpart t3">

@@ -86,7 +86,7 @@ class Page extends MY_Controller{
 		$this->session->unset_userdata('user_info');
 		//清除cookie
 		setcookie('autologin','',time()-3600,'/');
-		redirect('login/index');
+		redirect(base_url('login/index'));
 	}
 	
 	//部门管理页面
