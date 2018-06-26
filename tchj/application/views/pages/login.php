@@ -34,7 +34,7 @@
 			</div>
 		</div>
 	</div>
-	<div id="URL" class="dataField"><?php echo $config['URLSTR']; ?></div>
+	<div id="URL" class="dataField"><?php echo $base_url; ?></div>
 	<script src="/script/vue-2.5.9.min.js"></script>
 	<script src="/script/jquery-1.12.4.min.js"></script>
 	<script src="/script/relax_function1.1.1.js"></script>

@@ -92,8 +92,8 @@ var vu = new Vue({
       }
       ajax.data = {
         username: this.uname,
-        password: md5(this.upwd),
-				auto: this.auto?1:0
+        password: this.upwd,
+        auto: this.auto?1:0
       };
       ajax.send();
     },
@@ -119,7 +119,7 @@ var vu = new Vue({
           this.message="身份确认，登录成功，正在跳转请稍等...";
           setTimeout(function(){
             //top.location.href=this.cfg.server+"/pages;
-						location.reload();
+						location.href = CFGURL + 'page/index';
 					},1000);
         }
       }
@@ -140,7 +140,7 @@ var vu = new Vue({
 });
 
 var ajax = new relaxAJAX();
-ajax.url=CFGURL+'page/loginin';
+ajax.url=CFGURL+'login/loginin';
 ajax.before=vu.sendLogin;
 ajax.error=function(code, msg){
   vu.getReturn("", code, msg);

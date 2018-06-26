@@ -2,6 +2,11 @@
 //model部件测试用
 class Dt extends CI_Controller{
 	private $show='pages/check.php';
+
+	public function __construct()
+	{
+		parent::__construct();
+	}
 	
 	function login($username,$upwd){
 		if ($username=='' || $upwd==''){
@@ -24,8 +29,9 @@ class Dt extends CI_Controller{
 		}else{
 			$indata='';
 		}
-		$this->load->model('User');
-		$result=$this->User->user($indata);
+		#$this->load->model('User');
+		#$result=$this->User->user($indata);
+		$result = [];
 		if ($result['code']){
 			echo $result['code'].' '.$result['message'];
 		}else{
