@@ -33,7 +33,7 @@ if ($user['tid']==$config['USERM']){
 <?php
 }
 ?>
-		<a class="splitBar fa fa-calendar" href="<?php echo $config['URLSTR'] . 'pages/mission/'; ?>" target="contentshow">&ensp;任务列表</a>
+		<a class="splitBar fa fa-calendar" href="<?php echo $config['URLSTR'] . 'mission'; ?>" target="contentshow">&ensp;任务列表</a>
 		<a class="fa fa-file-o" href="" target="contentshow">&ensp;请示列表</a>
   </nav>
 	<div class="rexRightpart">
