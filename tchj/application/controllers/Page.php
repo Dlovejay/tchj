@@ -19,13 +19,8 @@ class Page extends MY_Controller{
 			'code'=>'',
 			'message'=>''
 		);
-		//默认检查用户登录状态
-		if ($this->userLogin==false){
-			$return['code']='440';
-			$return['message']='你还没有登录系统';
-			return $return;
-		}
-		$user=rexGetSession('user');
+
+		$user = $this->session->userdata('user_info');
 		if (count($usertype)>0){
 			if (in_array($user['tid'],$usertype)==false){
 				$return['code']='403';
@@ -80,47 +75,18 @@ class Page extends MY_Controller{
 	
 	//默认页面
 	public function index(){
-		$data['user']=rexGetSession('user');
+		$data['user'] = $this->session->userdata('user_info');;
 		$this->load->view('pages/main.php',$data);
 
-	}
-	
-	//登录
-	public function loginin(){
-		$indata=array(
-			'username'=>'',
-			'password'=>'',
-			'auto'=>''
-		);
-		foreach ($indata as $key=>$value){
-			$indata[$key]=$this->input->post($key);
-		}
-		//NOTICE 检查参数规范
-		if (empty($indata['password']) or empty($indata['username'])){
-			$this->_getReturn(401,'密码输入有误');
-			return;
-		}
-
-		$return = rexGetMReturn();
-		//加载用户model
-		$this->load->model('User');
-		$result=$this->User->userlogin($indata['username'],$indata['password']);
-		if (count($result) === 0){
-			$return['code']=500;
-			$return['message']='用户名或者密码错误';
-		}
-		# 登录成功 种session
-		$this->session->set_userdata(array('user_info' => $result[0]));
-		echo json_encode($return);
 	}
 	
 	//登出
 	public function loginout(){
 		//清除session
-		rexClrSession('user');
+		$this->session->unset_userdata('user_info');
 		//清除cookie
 		setcookie('autologin','',time()-3600,'/');
-		header('Location:'.URLSTR.'pages/');
+		redirect('login/index');
 	}
 	
 	//部门管理页面
@@ -211,12 +177,15 @@ class Page extends MY_Controller{
 				$data['job']=$result['data'];
 				$result=$this->Base->usertypeInfor();
 				$data['usertype']=$result['data'];
-				$data['account']=rexGetSession('user');
+				$data['account'] = $this->session->userdata('user_info');
 				$data['user']='';
 				$this->load->view('pages/account.php',$data);
 				break;
 			case 'edit':
-				if ($uid==0) $uid=rexGetSession('user','uid');
+				$account = $this->session->userdata('user_info');
+				if ($uid==0){
+					$uid = $account['uid'];
+				}
 				$flag=$this->_chkPower([],'accedit',array('uid'=>$uid));
 				if ($flag['code']!=''){
 					$data['ERROR']=$flag;
@@ -240,7 +209,7 @@ class Page extends MY_Controller{
 				$result=$this->Base->usertypeInfor(array('tid'=>$user[0]['tid']));
 				$data['usertype']=$result['data'];
 				$data['user']=$user[0];
-				$data['account']=rexGetSession('user');
+				$data['account'] = $account;
 				$this->load->view('pages/account.php',$data);
 				break;
 			default:
