@@ -6,17 +6,16 @@ class User extends CI_Model{
 	}
 	
 	//用户登录验证
-	public function userlogin($username,$password){
-		$return=rexGetMReturn();
-		$this->db->select('uid');
-		$this->db->from('user');
-		$this->db->where('username',$username);
-		$this->db->where('userpwd',$password);
-		if ($this->db->count_all_results()!=1){
-			$return['code']=500;
-			$return['message']='用户名或者密码错误 '.$this->db->last_query();
-		}
-		return $return;
+	public function userlogin($username, $password){
+		$where = array(
+			'username' => $username,
+			'userpwd' => md5($password)
+		);
+		$this->db->select('*')->from('user')->where($where);
+		$query = $this->db->get();
+		$result = $query->result_array();
+
+		return $result;
 	}
 	
 	//获得用户列表信息

@@ -63,10 +63,11 @@
  * Different environments will require different levels of error reporting.
  * By default development will show errors but testing and live will hide them.
  */
+
 switch (ENVIRONMENT)
 {
 	case 'development':
-		error_reporting(-1);
+		error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_USER_NOTICE);
 		ini_set('display_errors', 1);
 	break;
 
@@ -312,9 +313,12 @@ switch (ENVIRONMENT)
  *
  * And away we go...
  */
- 
-session_start();
-const URLSTR='http://127.0.0.1/index.php/'; //本站url
+
+//echo '<pre>';
+//print_r($_SERVER);
+//echo '</pre>';
+//exit;
+# const URLSTR='http://127.0.0.1/index.php/'; //本站url
 const FTPSTR='http://192.168.1.104/'; //外部FTP服务器url
 const USERM=1;
 const USERL=2;

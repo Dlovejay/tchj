@@ -1,38 +1,13 @@
 <?php
+
 //本站唯一controller
-class Page extends CI_Controller{
+class Page extends MY_Controller{
 	private $userLogin=false;    //标志用户登录状态
 	private $errpage='pages/error.php';  //错误显示页面
 	//ajax返回的错误标志 403权限问题 401客户端数据问题 440未登录 500服务端错误...
 	
 	public function __construct(){
 		parent::__construct();
-		$this->_chkUser();
-	}
-	
-	//检查用户登录状态
-	private function _chkUser(){
-		$user=rexGetSession('user');
-		if ($user!=''){
-			$this->userLogin=true;
-		}else{
-			//判断是否自动登录
-			if (isset($_COOKIE['autologin'])){
-				$autoStr=$_COOKIE['autologin'];
-				$username=substr($autoStr,32);
-				$password=substr($autoStr,0,32);
-				
-				$this->load->model('User');
-				$res=$this->User->login($username,$password);
-				if ($res!=false){
-					$this->userLogin=true;
-					setcookie('autologin',$password.$username, time()+REXSESSIONLIFE,'/');
-					rexSetSession('user',$res);
-				}else{
-					setcookie('autologin','',time()-3600,'/');
-				}
-			}
-		}
 	}
 	
 	//检查当前操作的权限
@@ -105,13 +80,9 @@ class Page extends CI_Controller{
 	
 	//默认页面
 	public function index(){
-		$data['config']=rexGetConfig();
-		if ($this->userLogin==false){
-			$this->load->view('pages/login.php',$data);
-		}else{
-			$data['user']=rexGetSession('user');
-			$this->load->view('pages/main.php',$data);
-		}
+		$data['user']=rexGetSession('user');
+		$this->load->view('pages/main.php',$data);
+
 	}
 	
 	//登录
@@ -124,16 +95,23 @@ class Page extends CI_Controller{
 		foreach ($indata as $key=>$value){
 			$indata[$key]=$this->input->post($key);
 		}
-		
 		//NOTICE 检查参数规范
-		if (strlen($indata['password'])!=32){
+		if (empty($indata['password']) or empty($indata['username'])){
 			$this->_getReturn(401,'密码输入有误');
 			return;
 		}
-		
+
+		$return = rexGetMReturn();
 		//加载用户model
 		$this->load->model('User');
-		$result=$this->User->login($indata['username'],$indata['password']);
+		$result=$this->User->userlogin($indata['username'],$indata['password']);
+		if (count($result) === 0){
+			$return['code']=500;
+			$return['message']='用户名或者密码错误';
+		}
+		# 登录成功 种session
+		$this->session->set_userdata(array('user_info' => $result[0]));
+		echo json_encode($return);
 	}
 	
 	//登出
