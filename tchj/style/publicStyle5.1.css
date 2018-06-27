@@ -238,5 +238,5 @@ article,aside,dialog,footer,header,section,footer,nav,figure,menu{ display:block
 html{ font-size:10px;}
 body{ font-size:14px;}
 .outFrame{ width:100%; height:100%; margin:0; padding:0; position:relative; z-index:0; overflow:auto; -webkit-overflow-scrolling:touch;}
-.bkStyle1{ background-image:linear-gradient(45deg,transparent 5px,#a5acdd 0,#a5acdd 10px,transparent 0,transparent 15px,#a5acdd 0,#a5acdd 20px,transparent 0,transparent 25px,#a5acdd 0,#a5acdd 30px,transparent 0,transparent 35px,#a5acdd 0,#a5acdd 40px,transparent 0); background-repeat:no-repeat; background-position:left bottom; background-size:150px 50px;}
 .dataField{ display:none;}
+.bkStyle1{ background-image:linear-gradient(45deg,transparent 25px,#a5acdd 0,#a5acdd 30px,transparent 0,transparent 35px,#a5acdd 0,#a5acdd 40px,transparent 0,transparent 45px,#a5acdd 0,#a5acdd 50px,transparent 0,transparent 55px,#a5acdd 0,#a5acdd 60px,transparent 0); background-repeat:no-repeat; background-position:-30px bottom; background-size:150px 50px;}

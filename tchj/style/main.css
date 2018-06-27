@@ -1,4 +1,12 @@
 @charset "utf-8";
+.rexFrame{ padding-top:70px; padding-bottom:50px;}
+.rexFrame .rexTopbar{ height:70px; width:100%; margin-top:-70px;}
+.rexFrame .rexBottom{ height:50px; width:100%; margin-top:-50px;}
+.rexFrame .rexLeftpart{ float:left; width:200px; height:100%; overflow:auto;}
+.rexFrame .rexRightpart{ display:block; margin-left:200px; height:100%; overflow:auto;}
+.rexFrame.nt{ padding-top:0;}
+.rexFrame.nb{ padding-bottom:0;}
+
 .rexTopbar{ background-color:#282f5d; padding:3px; position:relative;}
 .rexTopbar img{ float:left; margin-left:20px; height:100%;}
 .rexTopbar h1{ margin-left:100px; margin-top:16px; font-size:24px; font-weight:normal; opacity:.9;}
@@ -13,10 +21,15 @@
 .userInfor .userType{ display:block; margin-left:52px; color:#f90;}
 .userInfor .userMenu{ padding:5px 0; text-align:center;}
 
-.rexLeftpart{ background-color:#b7bef0; text-align:center;}
+.rexLeftpart{ background-color:#b7bef0; text-align:center; box-shadow:-3px 2px 5px rgba(0,0,0,.2) inset;}
 .rexLeftpart a{ display:block; height:42px; line-height:42px; border-bottom:1px solid #626cb2;}
+.rexLeftpart a:before{ color:#404fb4;}
 .rexLeftpart a:first-child{ margin-top:5px;}
 .rexLeftpart a:hover{ background-color:#515ba6; color:#cbd1ff;}
+.rexLeftpart a:hover:before{ color:#ffd6b4;}
 .rexLeftpart a.sel{ background-color:#282f5d; color:#fff;}
+.rexLeftpart a.sel:before{ color:#ffd6b4;}
 .rexLeftpart .splitBar{ margin-top:20px;}
 .rexLeftpart a:first-child.splitBar{ margin-top:5px;}
+
+.rexRightpart{ padding:10px;}
