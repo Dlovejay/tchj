@@ -4,14 +4,27 @@
 //相关配置
 var CFG={
 	ver: "Ver1.0",
+	UM:1,
+	UL:2,
+	UU:3,
+	UD:4,
 	pagesize: 20,  //分页数量
 };
 var URL={  //本站URL地址
 	loginin:'/index.php/rextest/loginin/',
 	loginout:'/index.php/rextest/loginout/',
 	main:'/index.php/rextest/',
-	department:'index.php/rextest/department',
-	job:'index.php/rextest/job'
+	department:'/index.php/rextest/department',
+	job:'/index.php/rextest/job',
+	user:'/index.php/rextest/user',
+	mission:'/index.php/rextest/mission',
+	missionlist:'/index.php/rextest/missionlist',
+	missionadd:'/index.php/rextest/missionadd',
+	returnlist:'/index.php/rextest/returnlist',
+	consult:'/index.php/rextest/consult',
+	consultlist:'/index.php/rextest/consultlist',
+	consultadd:'/index.php/rextest/consultadd',
+	consultreturn:'/index.php/rextest/consultreturn'
 };
 //正则字典
 var REG={

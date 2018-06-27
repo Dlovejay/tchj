@@ -37,19 +37,27 @@ class Rextest extends CI_Controller{
 	private function _chkLogin($username){
 		switch($username){
 			case 'admin':
+				$uid=1;
 				$tid=1;
+				$pid=0;
 				$tname='系统管理员';
 				break;
 			case 'user':
+				$uid=2;
 				$tid=4;
+				$pid=6;
 				$tname='下级用户';
 				break;
 			case 'leader':
+				$uid=5;
 				$tid=2;
+				$pid=0;
 				$tname='支队领导';
 				break;
 			case 'manager':
+				$uid=3;
 				$tid=3;
+				$pid=3;
 				$tname='上级用户';
 				break;
 			default:
@@ -57,7 +65,9 @@ class Rextest extends CI_Controller{
 		}
 		return array(
 			'username'=>$username,
+			'uid'=>$uid,
 			'tid'=>$tid,
+			'pid'=>$pid,
 			'tname'=>$tname
 		);
 	}
@@ -105,11 +115,76 @@ class Rextest extends CI_Controller{
 			$this->_getReturn();
 		}
 	}
-	
+	//HTTP登出
 	function loginout(){
 		//清除session和cookie
 		unset($_SESSION['user']);
 		setcookie('autologin','',time()-3600,'/');
 		header('Location:/index.php/rextest/');
 	}
+	
+	//HTTP部门管理
+	function department(){
+		$this->load->model('Test');
+		$result=$this->Test->department();
+		$data['department']=$result['data'];
+		$this->load->view('rexshow/department.php',$data);
+	}
+	
+	//HTTP职务管理
+	function job(){
+		$this->load->model('Test');
+		$result=$this->Test->job();
+		$data['job']=$result['data'];
+		$this->load->view('rexshow/job.php',$data);
+	}
+	
+	//HTTP显示用户列表
+	public function user(){
+		$this->load->model('Test');
+		$result=$this->Test->user();
+		$data['user']=$result['data'];
+		$data['account']=$_SESSION['user'];
+		$this->load->view('rexshow/userlist.php',$data);
+	}
+	
+	//HTTP任务列表页面
+	public function mission(){
+		$this->load->model('Test');
+		$result=$this->Test->user();
+		$data['user']=$result['data'];
+		$result=$this->Test->department();
+		$data['department']=$result['data'];
+		$data['account']=$_SESSION['user'];
+		$this->load->view('rexshow/mission.php',$data);
+	}
+	
+	//AJAX 获取任务列表
+	public function missionlist(){
+		$this->load->model('Test');
+		$result=$this->Test->mission(array('nowpage'=>1));
+		$this->_getReturn($result);
+	}
+	
+	//AJAX 获得回复列表
+	public function returnlist(){
+		$indata=array(
+			'mid'=>$this->input->post('mid')
+		);
+		$this->load->model('Test');
+		$result=$this->Test->returnlist($indata);
+		$this->_getReturn($result);
+	}
+	
+	//HTTP请示列表页面
+	public function consult(){
+		$this->load->model('Test');
+		$result=$this->Test->user();
+		$data['user']=$result['data'];
+		$result=$this->Test->department();
+		$data['department']=$result['data'];
+		$data['account']=$_SESSION['user'];
+		$this->load->view('rexshow/consult.php',$data);
+	}
+	
 }

@@ -1,12 +1,4 @@
 @charset "utf-8";
-.rexFrame{ padding-top:70px; padding-bottom:50px;}
-.rexFrame .rexTopbar{ height:70px; width:100%; margin-top:-70px;}
-.rexFrame .rexBottom{ height:50px; width:100%; margin-top:-50px;}
-.rexFrame .rexLeftpart{ float:left; width:200px; height:100%; overflow:auto;}
-.rexFrame .rexRightpart{ display:block; margin-left:200px; height:100%; overflow:auto;}
-.rexFrame.nt{ padding-top:0;}
-.rexFrame.nb{ padding-bottom:0;}
-
 .rexTopbar{ background-color:#282f5d; padding:3px; position:relative;}
 .rexTopbar img{ float:left; margin-left:20px; height:100%;}
 .rexTopbar h1{ margin-left:100px; margin-top:16px; font-size:24px; font-weight:normal; opacity:.9;}
