@@ -29,8 +29,8 @@ class Login extends CI_Controller
         }
         //NOTICE 检查参数规范
         if (empty($indata['password']) or empty($indata['username'])){
-            $this->_getReturn(401,'密码输入有误');
-            return;
+            echo json_encode(array('code' => 401, 'message' => '密码输入有误'));
+            exit();
         }
 
         $return = rexGetMReturn();
