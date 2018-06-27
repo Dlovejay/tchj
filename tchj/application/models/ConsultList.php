@@ -10,8 +10,8 @@ class ConsultList extends CI_Model
 
     public function query($where=array(), $field="*", $limit=10, $offset=0)
     {
-        $this->db->select($field)->from($this->table)->where($where)->limit($limit, $offset);
-        $query = $this->db->get();
+        $this->db->select($field)->where($where);
+        $query = $this->db->get($this->table, $offset, $limit);
         $result = $query->result_array();
 
         return $result;
