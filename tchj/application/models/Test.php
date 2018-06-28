@@ -337,7 +337,7 @@ class Test extends CI_Model {
 				$real='status>0 OR author='.$user['uid'];
 				break;
 			case 3: //上级用户
-				$real='(author='.$user['uid'].' AND status<>-1 OR (status>0 AND pass=\'0\'))';
+				$real='author='.$user['uid'].' OR (status>0 AND pass=\'0\')';
 				break;
 			case 4: //下级用户
 				$sql='SELECT A.* FROM missionlist AS A INNER JOIN missiondepartment AS B ON A.mid=B.mid WHERE A.status>0 AND (B.pid='.$_SESSION['user']['pid'].' OR B.pid=0)';
@@ -386,5 +386,124 @@ class Test extends CI_Model {
 		//die($this->db->last_query());
 		$return['data']=$query->result_array();
 		return $return;
+	}
+	
+	//添加任务
+	public function missionadd($arr=''){
+		$return=rexGetMReturn();
+		$row=array(
+			'mtitle' => $arr['title'],
+			'datemake' => date("Y-m-d"),
+			'datestart' => $arr['datestart'],
+			'dateend' => $arr['dateend'],
+			'mcontent' => $arr['intro'],
+			'annex' => json_encode($arr['annex']),
+			'author' => $_SESSION['user']['uid'],
+			'tips' => $arr['tips'],
+			'status' => 0,
+			'timeout' => 0,
+			'rcount' => 0,
+			'pass' => ''
+		);
+		if ($row['pass'] != '0') {
+			//检测当前的发布部门是否存在
+			$this->db->select('pid');
+			$this->db->where_in('pid', $arr['power']);
+			$this->db->from('department');
+			if ($this->db->count_all_results() <= 0) {
+				$return['code'] = 500;
+				$return['message'] = '任务指派部门参数有误 ';
+				return $return;
+			};
+			$row['pass'] = implode(',', $arr['power']);
+		}
+		//开始日期小于当前日期，则status=1
+		if ($row['datestart']<=date("Y-m-d")){
+			$row['status']=1;
+		}
+		//结束时间为空，则不做设置，使用数据库定义的默认值
+		if ($row['dateend'] == '') unset($row['dateend']);
+		$result = $this->db->insert('missionlist', $row);
+		if (!$result) {
+			$return['code'] = 550;
+			$return['message'] = '插入任务数据出现问题，请工程师核查 ';
+			$return['message'] = $this->db->last_query();
+			return $return;
+		}
+		//获得新插入的任务id编号
+		$nowid = $this->db->insert_id();
+		if ($row['pass'] == '0') {
+			$result = $this->db->insert('missiondepartment', array('mid' => $nowid, 'pid' => 0));
+		} else {
+			$row = array();
+			for ($i = 0; $i < count($arr['power']); $i++) {
+				array_push($row, array('mid' => $nowid, 'pid' => $arr['power'][$i]));
+			}
+			$result = $this->db->insert_batch('missiondepartment', $row);
+		}
+		if (!$result) {
+			$return['code'] = 550;
+			$return['message'] = '插入任务数据出现问题，请工程师核查 ';
+		} else {
+			$return['data'] = $nowid;
+		}
+		return $return;
+	}
+	
+	//获得概览数据
+	public function overview(){
+		$return=rexGetMReturn();
+		$tid=$_SESSION['user']['tid'];
+		$uid=$_SESSION['user']['uid'];
+		$pid=$_SESSION['user']['pid'];
+		$this->db->select('missionlist.mid');
+		$this->db->from('missionlist');
+		switch($tid){
+			case 1: //管理员
+				break;
+			case 2: //支队领导
+				$this->db->where('(status>0 OR author='.$uid.')');
+				break;
+			case 3: //上级用户
+				$this->db->where('(author='.$uid.' OR (status>0 AND pass=\'0\'))');
+				break;
+			case 4: //下级用户
+				$this->db->join('missiondepartment','missionlist.mid=missiondepartment.mid','inner');
+				$this->db->where('(status>0 AND (pid='.$pid.' OR pid=0))');
+				break;
+		}
+		$sql=$this->db->get_compiled_select();
+		//$sql  //任务总数
+		$sql1=$sql.' AND status=4';  //完成总数
+		$sql2=$sql.' AND rcount=3 AND status=4';  //首次完成数
+		$sql3=$sql.' AND status in (1,2,3,5)';  //进行中数
+		$sql4=$sql.' AND status=3';  //待审核数
+		$sql5=$sql.' AND status=6';  //撤销数量
+		$query=$this->db->query($sql);
+		$allcount=$query->num_rows();
+		
+		$query=$this->db->query($sql1);
+		$finish=$query->num_rows();
+		
+		$query=$this->db->query($sql2);
+		$first=$query->num_rows();
+		
+		$query=$this->db->query($sql3);
+		$doing=$query->num_rows();
+		
+		$query=$this->db->query($sql4);
+		$wait=$query->num_rows();
+		
+		$query=$this->db->query($sql5);
+		$del=$query->num_rows();
+		
+		return array(
+			'all'=>$allcount,
+			'finish'=>$finish,
+			'first'=>$first,
+			'doing'=>$doing,
+			'wait'=>$wait,
+			'del'=>$del
+		);
 	}
 }

@@ -278,7 +278,7 @@ body{ font-size:14px;}
 .header .count{ padding-right:10px; vertical-align:middle;}
 .header .count strong{ color:#d70000;}
 /* 表格内容 */
-.captionTitle{ padding:10px 0 5px 0; text-align:left;}
+.captionTitle{ padding:10px 0 5px 0; text-align:left; line-height:30px;}
 .captionTitle span{ color:#777; font-size:16px;}
 .captionTitle span:before{ color:#eb8e16;}
 .captionTitle .rexButton{ float:right; font-size:14px;}

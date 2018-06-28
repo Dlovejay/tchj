@@ -17,6 +17,7 @@ var URL={  //本站URL地址
 	department:'/index.php/rextest/department',
 	job:'/index.php/rextest/job',
 	user:'/index.php/rextest/user',
+	overview:'/index.php/rextest/overview',
 	mission:'/index.php/rextest/mission',
 	missionlist:'/index.php/rextest/missionlist',
 	missionadd:'/index.php/rextest/missionadd',

@@ -195,7 +195,7 @@
 			<div class="dialogFrame">
 				<div class="dialog-title">
 					<span class="opBnt right fa fa-lg fa-times" v-if="load.re==false" @click="hideDialog('viewOP')"></span>
-					<span class="opBnt left fa fa-lg fa-pencil" title="修改当前任务信息" v-if="viewobj.authorid==me.uid && load.re==false" @click="showDialog('inforOP')"></span>
+					<span class="opBnt left fa fa-lg fa-pencil" title="修改当前任务信息" v-if="load.re==false && bs5" @click="showDialog('inforOP')"></span>
 					<h4 class="t3"><span class="fa fa-eye"></span>&emsp;<span class="diy">查看任务详情</span></h4>
 				</div>
 				<div class="dialog-content">
@@ -244,14 +244,11 @@
 							<li class="alone formpart table returnList">
 								<div class="captionTitle">
 									<span class="fa fa-comments-o"> 回复列表</span>
+									<button class="rexButton fa fa-refresh ss infor" title="刷新回复列表" @click="getReturnlist()"></button>
 								</div>
 								<div v-for="item in returnList[viewobj.mid]" v-bind:class="item.classstr">
 									<span class="reuser"><strong>{{item.username}}</strong>{{item.datemake}}</span>
 									<div class="recontent">{{item.content}}</div>
-								</div>
-								<div class="anmanager">
-									<span class="reuser"><strong>manager</strong> 2018-06-34</span>
-									<div class="recontent">回复内容回复内容回复内容回复内容回复内容回复内容回复内容</div>
 								</div>
 							</li>
 						</ul>
@@ -387,8 +384,8 @@
 								<input type="text" class="rexInput" v-model="axTemp.name"/>
 							</span>
 						</div>
-						<div class="tipMessage" v-bind:class="chk[2].flag" v-if="chk[2].flag">
-							<span class="fa fa-lg" v-bind:class="{'fa-warning':chk[2].flag=='warning'}">&ensp;{{chk[2].msg}}</span>
+						<div class="tipMessage" v-if="chk[2].flag">
+							<span class="fa" v-bind:class="chk[2].flag">&ensp;{{chk[2].msg}}</span>
 						</div>
 					</div>
 				</div>

@@ -33,12 +33,12 @@ if ($user['tid']=='1'){
 <?php
 }
 ?>
-		<a class="splitBar fa fa-bar-chart-o" href="#" target="contentshow" v-bind:class="{'sel':nowSel==4}" @click="setSel(4)">&ensp;工作概览</a>
+		<a class="splitBar fa fa-bar-chart-o" v-bind:href="url.overview" target="contentshow" v-bind:class="{'sel':nowSel==4}" @click="setSel(4)">&ensp;工作概览</a>
 		<a class="fa fa-calendar" v-bind:href="url.mission" target="contentshow" v-bind:class="{'sel':nowSel==5}" @click="setSel(5)">&ensp;任务列表</a>
 		<a class="fa fa-paste" v-bind:href="url.consult" target="contentshow" v-bind:class="{'sel':nowSel==6}" @click="setSel(6)">&ensp;请示列表</a>
   </nav>
 	<div class="rexRightpart">
-		<iframe src="" name="contentshow"></iframe>
+		<iframe v-bind:src="url.overview" name="contentshow"></iframe>
 	</div>
 </div>
 <div id="user" class="dataField"><?php echo json_encode($user); ?></div>
@@ -61,6 +61,8 @@ var vu=new Vue({
 		}
 	},
 	created:function(){
+		this.nowSel=4;
+		
 	}
 });
 </script>

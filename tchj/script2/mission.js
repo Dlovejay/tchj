@@ -99,6 +99,10 @@ var vu=new Vue({
 				}
 			}
 			return false;
+		},
+		bs5: function(){ //是否可编辑任务
+			if (this.viewobj && (this.viewobj.status==0 || this.viewobj.status==1) && this.viewobj.authorid==this.me.uid) return true;
+			return false;
 		}
 	},
 	methods:{

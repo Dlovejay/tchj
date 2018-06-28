@@ -1,6 +1,6 @@
 <?php 
-//前端测试用
-class Rextest extends CI_Controller{
+//前端测试用 用于嵌入网站系统
+class Rextest2 extends CI_Controller{
 	private $userLogin=false;
 	public function __construct(){
 		parent::__construct();
@@ -87,10 +87,10 @@ class Rextest extends CI_Controller{
 	
 	function index(){  //登录页或者主页
 		if ($this->userLogin==false){
-			$this->load->view('rexshow/login.php');
+			$this->load->view('rexshow/noticelogin.php');
 		}else{
 			$data['user']=$_SESSION['user'];
-			$this->load->view('rexshow/main.php',$data);
+			$this->load->view('rexshow/noticeshow.php',$data);
 		}
 	}
 	
@@ -123,98 +123,5 @@ class Rextest extends CI_Controller{
 		header('Location:/index.php/rextest/');
 	}
 	
-	//HTTP部门管理
-	function department(){
-		$this->load->model('Test');
-		$result=$this->Test->department();
-		$data['department']=$result['data'];
-		$this->load->view('rexshow/department.php',$data);
-	}
 	
-	//HTTP职务管理
-	function job(){
-		$this->load->model('Test');
-		$result=$this->Test->job();
-		$data['job']=$result['data'];
-		$this->load->view('rexshow/job.php',$data);
-	}
-	
-	//HTTP显示用户列表
-	public function user(){
-		$this->load->model('Test');
-		$result=$this->Test->user();
-		$data['user']=$result['data'];
-		$data['account']=$_SESSION['user'];
-		$this->load->view('rexshow/userlist.php',$data);
-	}
-	
-	//HTTP任务列表页面
-	public function mission(){
-		$this->load->model('Test');
-		$result=$this->Test->user();
-		$data['user']=$result['data'];
-		$result=$this->Test->department();
-		$data['department']=$result['data'];
-		$data['account']=$_SESSION['user'];
-		$this->load->view('rexshow/mission.php',$data);
-	}
-	
-	//AJAX 获取任务列表
-	public function missionlist(){
-		$this->load->model('Test');
-		$result=$this->Test->mission(array('nowpage'=>1));
-		$this->_getReturn($result);
-	}
-	
-	//AJAX 获得回复列表
-	public function returnlist(){
-		$indata=array(
-			'mid'=>$this->input->post('mid')
-		);
-		$this->load->model('Test');
-		$result=$this->Test->returnlist($indata);
-		$this->_getReturn($result);
-	}
-	
-	//HTTP请示列表页面
-	public function consult(){
-		$this->load->model('Test');
-		$result=$this->Test->user();
-		$data['user']=$result['data'];
-		$result=$this->Test->department();
-		$data['department']=$result['data'];
-		$data['account']=$_SESSION['user'];
-		$this->load->view('rexshow/consult.php',$data);
-	}
-	
-	//HTTP概览页面
-	public function overview(){
-		$this->load->model('Test');
-		$result=$this->Test->overview();
-		$data['infor']=$result;
-		$this->load->view('rexshow/overview.php',$data);
-	}
-	
-	//AJAX提交任务
-	public function missionadd(){
-		$indata=array(
-			'title'=>'',
-			'tips'=>'',
-			'datestart'=>'',
-			'dateend'=>'',
-			'intro'=>'',
-			'power'=>'',
-			'annex'=>'',
-			'powertype'=>''
-		);
-		foreach ($indata as $key=>$value){
-			$indata[$key]=$this->input->post($key);
-		}
-		if ($indata['powertype']!='' && $indata['powertype']=='0'){
-			$indata['power']='0';
-		}
-		$this->load->model('Test');
-		$result=$this->Test->missionadd($indata);
-		$this->_getReturn($result);
-	}
 }
