@@ -118,7 +118,7 @@ var vu = new Vue({
           this.mtype="ok";
           this.message="身份确认，登录成功，正在跳转请稍等...";
           setTimeout(function(){
-						location.href ='/page/index';
+						location.href = CFGURL + '/page/index';
 					},1000);
         }
       }
@@ -139,7 +139,7 @@ var vu = new Vue({
 });
 
 var ajax = new relaxAJAX();
-ajax.url='/login/loginin';
+ajax.url= CFGURL + '/login/loginin';
 ajax.before=vu.sendLogin;
 ajax.error=function(code, msg){
   vu.getReturn("", code, msg);

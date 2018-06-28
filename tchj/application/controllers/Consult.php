@@ -92,7 +92,7 @@ class Consult extends MY_Controller
             'message' => '',
             'data' => []
         );
-        if(empty($title) || empty($content) || empty($annex)){
+        if(empty($title) || empty($content)){
             $return['code'] = 10;
             $return['message'] = '参数不能为空';
 
