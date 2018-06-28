@@ -1,17 +1,16 @@
 <?php
 class ConsultList extends CI_Model
 {
-    public $table = 'consultlist';
     public function __construct()
     {
         parent::__construct();
         $this->load->database();
     }
 
-    public function query($where=array(), $field="*", $limit=10, $offset=0)
+    public function query($where=array(), $field="*", $limit=10, $offset=0, $table='consultlist')
     {
         $this->db->select($field)->where($where);
-        $query = $this->db->get($this->table, $offset, $limit);
+        $query = $this->db->get($table, $offset, $limit);
         $result = $query->result_array();
 
         return $result;
