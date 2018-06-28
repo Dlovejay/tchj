@@ -118,7 +118,7 @@ var vu = new Vue({
           this.mtype="ok";
           this.message="身份确认，登录成功，正在跳转请稍等...";
           setTimeout(function(){
-						location.href = CFGURL + '/page/index';
+						location.href = CFGURL + 'page/index';
 					},1000);
         }
       }
