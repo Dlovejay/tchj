@@ -19,9 +19,9 @@ class ConsultList extends CI_Model
     public function query_total($where=array())
     {
         if (empty($where)) {
-            return $this->db->count_all($this->table);
+            return $this->db->count_all('consultlist');
         }else{
-            return $this->db->where($where)->count_all_results($this->table);
+            return $this->db->where($where)->count_all_results('consultlist');
         }
     }
 }

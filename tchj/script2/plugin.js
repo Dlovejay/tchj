@@ -57,7 +57,7 @@
 		setStyle(divObj,sty1);
 		divObj.appendChild(divHead);
 		divObj.appendChild(iframeObj);
-		iframeObj.src='http://192.168.1.32/index.php/rextest2/';
+		iframeObj.src='http://www.workday.com/index.php/rextest2/';
 		body.appendChild(divObj);
 		noticeObj=divBtn;
 		noticeObj.addEventListener('click',function(){

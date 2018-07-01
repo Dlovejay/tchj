@@ -4,93 +4,348 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="UTF-8">
 	<title>太仓海警支队</title>
+	<link rel="stylesheet" href="http://www.relaxset.com/_PUB/style/publicStyle5.2.min.css"/>
 <style type="text/css">
-*{ font-family:"Microsoft YaHei",tahoma,arial,'Hiragino Sans GB','\5b8b\4f53',sans-serif; box-sizing:border-box;}
-*:after,*:before{ box-sizing:border-box;}
-html,body,h1,h2,h3,h4,h5,h6,dl,dt,dd,p,ul,li,form,iframe,object,input,select,button{ margin:0; padding:0;}
-a{ text-decoration:none; color:inherit; -webkit-tap-highlight-color:transparent;}
-a:active, a:focus, input:active, input:focus, button:active, button:focus{ outline:none; -moz-outline:none;}
-table { border-collapse:collapse; border-spacing:0; width:100%;}
-html,body{ /* position:relative; */ height:100%; width:100%; overflow:hidden; font-size:14px;}
+.rexTable.green{ background-color:#0B7D12;}
+.rexTable.green tr:hover{ background-color:#FF9DA1;}
+.rexTable.green tr:first-child{ background-color:transparent; color:#fff;}
 
-h1{ text-align:center; border-bottom:1px solid #ccc;}
-.list>li{ margin-bottom:10px; position:relative;}
-.list>li:after{ content:''; position:absolute; left:0; bottom:-10px; height:10px; width:100%; border-top:1px solid #ccc; border-bottom:1px solid #ccc; background-color:#eee;}
-.list>li:last-child:after{ display:none;}
-h2{ padding:5px;}
-.url{ font-size:16px;}
-.part{ padding:5px;}
-p{ padding-left:20px;}
+.outFrame{ background-color:#eee;}
+.rexTopbar{ position:relative;}
+h1,h2,h2 b,h2 strong,caption strong{ font-weight:normal;}
+h1{ line-height:70px; text-indent:1em;}
+.rexTab.left{ text-align:left;}
+.rexTab.right{ text-align:right;}
+.rexTab.center{ text-align:center;}
+.rexTab{ position:absolute; bottom:1px; padding-right:40px;}
+.intro{ padding:10px 0; color:#476AB8;}
+.part{ border:2px solid #F19600; border-radius:10px; margin-top:25px; padding:10px; padding-top:15px; position:relative;}
+.part h3{ position:absolute; background-color:#F19600; top:-15px; right:50px; padding:1px 45px 2px 45px; border-radius:6px; color:#fff;}
+.part.rd{ border-color:#30BE39;}
+.part.rd h3{ background-color:#30BE39;}
+.listshow{ border:1px solid #ccc; border-radius:6px; overflow:hidden; margin-bottom:10px;}
+caption{ padding:10px; text-align:center; background-color:#3424CB; border:1px solid #fff; border-bottom:0; color:#fff; border-radius:5px 5px 0 0; font-size:1.2em;}
+caption .rexTip{ padding:1px 6px; cursor:pointer; font-weight:600;}
+.listshow table{ border-radius:0 0 5px 5px;}
+.green caption{ background-color:#08A22D;}
+
+.list>li{ border:1px solid #ccc; border-left:0; border-right:0; margin-bottom:10px; background-color:#fff; padding:10px;}
+.list>li:first-child{ border-top:0;}
 </style>
 </head>
 <body>
-	<h1>太仓海警支队页面和接口说明</h1>
-	<ul class="list">
-		<li>
-			<h2>1 登录页 <span class="url">/page/</span></h2>
-			<div class="part">
-				<strong>ajax</strong>
-				<ol>
+	<div id="app" class="outFrame rexFrame nb nl">
+		<header class="rexTopbar">
+			<h1>{{title}}</h1>
+			<ul class="rexTab t3 right noHead">
+				<li class="rexItem" v-bind:class="{'sel':page[pagesel]=='general'}" @click="viewpage('general')">通用格式</li>
+				<li class="rexItem" v-bind:class="{'sel':page[pagesel]=='base'}" @click="viewpage('base')">基本 <span class="rexTip infor t1">{{data['base'].length}}</span></li>
+				<li class="rexItem" v-bind:class="{'sel':page[pagesel]=='mission'}" @click="viewpage('mission')">任务 <span class="rexTip infor t1">{{data['mission'].length}}</span></li>
+				<li class="rexItem" v-bind:class="{'sel':page[pagesel]=='consult'}" @click="viewpage('consult')">请示 <span class="rexTip infor t1">{{data['consult'].length}}</span></li>
+			</ul>
+		</header>
+		<div class="rexRightpart">
+			<ul class="list noHead" v-for="part in page" v-if="page[pagesel]==part">
+				<li v-for="(item,index) in data[part]">
+					<h2>
+						<b>{{index+1}}</b>
+						<strong>{{item.name}}</strong>
+						<span class="url">{{item.url}}</span>
+					</h2>
+					<p class="intro" v-if="item.intro">{{item.intro}}</p>
+					<div class="part" v-if="item.ajax.length>0">
+						<h3>ajax</h3>
+						<ul class="noHead">
+							<li v-for="subitem in item.ajax" class="listshow">
+								<table class="rexTable">
+									<caption class="s3D">
+										<strong>{{ajaxSource[subitem].name}}</strong>
+										<span>{{ajaxSource[subitem].url}}</span>
+										<span class="rexTip warning" v-if="ajaxSource[subitem].intro" v-bind:title="ajaxSource[subitem].intro">?</span>
+									</caption>
+									<tr>
+										<th></th>
+										<th>键名</th>
+										<th>必要</th>
+										<th>默认</th>
+										<th width="50%">说明</th>
+									</tr>
+									<tr v-for="(ssitem,index2) in ajaxSource[subitem].key">
+										<td>{{index2+1}}</td>
+										<td>{{ssitem.txt}}</td>
+										<td>{{ssitem.rq==1? 'Yes':'No'}}</td>
+										<td>{{ssitem.def}}</td>
+										<td><span class="txt">{{ssitem.intro}}</span></td>
+									</tr>
+								</table>
+							</li>
+						</ul>
+					</div>
+					<div class="part rd" v-if="item.render.length>0">
+						<h3>渲染数据</h3>
+						<ul class="noHead">
+							<li v-for="subitem in item.render" class="listshow">
+								<table class="rexTable green">
+									<caption class="s3D">
+										<strong>{{renderSource[subitem].name}}</strong>
+										<span>{{renderSource[subitem].va}}</span>
+										<span class="rexTip warning" v-if="renderSource[subitem].intro" v-bind:title="renderSource[subitem].intro">?</span>
+									</caption>
+									<tr>
+										<th></th>
+										<th>键名</th>
+										<th>必要</th>
+										<th width="50%">说明</th>
+									</tr>
+									<tr v-for="(ssitem,index2) in renderSource[subitem].key">
+										<td>{{index2+1}}</td>
+										<td>{{ssitem.txt}}</td>
+										<td>{{ssitem.rq==1? 'Yes':'No'}}</td>
+										<td><span class="txt">{{ssitem.intro}}</span></td>
+									</tr>
+								</table>
+							</li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			
+			<div class="list" v-if="page[pagesel]=='general'">
+				<ul class="list noHead">
 					<li>
-						<b>用户登录接口 <span>/login/</span></b><br/>
-						<span>post {username:用户名,password:密码,auto:[1,0]自动登录，1自动}</span><br/>
-						<span>return {code:...message:...}</span>
+						<h2>ajax的返回结构</h2>
+						<p class="intro">
+							return:{code:'',message:'',data:''}
+						</p>
+						<p>
+							<b>说明：</b>当没有任何错误返回的时候，code:'0'(字符串0),message:'' data中添加需要返回的数值，如果有的话<br/>
+							<b>对于data：</b>除了插入数据的情况，其他情况按需要返回，插入数据的情况请把新增数据的id编号返回，以便前端做列表展示的时候可以避免在去整体刷新
+						</p>
 					</li>
-				</ol>
+					<li>
+						<h2>SESSION结构</h2>
+						<p><strong>登录用户身份信息 user_infor</strong> {uid,usernae,tid,tname,pid,pname,jid,jname}</p>
+						<p>
+					</li>
+					<li>
+						<h2>COOKIE结构</h2>
+						<p><strong>自动登录信息 autologin</strong> md5(password)+username</p>
+						<p>
+					</li>
+				</ul>
 			</div>
-		</li>
-		<li>
-			<h2>2 登出页 <span class="url">/page/</span></h2>
-			<div class="part">
-				<span>本页面无任何数据提交，请在ctroller中清除session和cookie即可</span>
-			</div>
-		</li>
-		<li>
-			<h2>3 主框架页 <span class="url">/page/</span></h2>
-			<div class="part">
-				<strong>渲染数据</strong>
-				<ol>
-					<li>
-						<b>当前登录用户信息</b><br/>
-						<span>{username,tid,tname(用户类型名称),pid,pname(部门名称),jid,jname(职务名称)}</span>
-					</li>
-				</ol>
-			</div>
-		</li>
-		<li>
-			<h2>4 部门管理页 <span class="url">/page/</span></h2>
-			<div class="part">
-				<strong>渲染数据</strong>
-				<ol>
-					<li>
-						<b>当前部门信息</b><br/>
-						<span>[{pid,pname,plevel},{...}...]</span>
-					</li>
-				</ol>
-			</div>
-			<div class="part">
-				<strong>ajax</strong>
-				<ol>
-					<li>
-						<b>新增部门接口 <span>/login/</span></b><br/>
-						<span>post {pname:部门名称,plevel:部门级别[1,2] 其他数值判定为出错}</span><br/>
-						<span>return {code:...message:...,data:新增id}</span>
-					</li>
-					<li>
-						<b>修改部门接口 <span>url</span></b><br/>
-						<span>post {pid,pname:部门名称}</span><br/>
-						<span>return {code:...message:...}</span>
-					</li>
-					<li>
-						<b>删除部门 <span>url</span></b><br/>
-						<span>post {pid}</span><br/>
-						<span>return {code:...message:...}</span>
-					</li>
-				</ol>
-			</div>
-		</li>
-	</ul>
+		</div>
+	</div>
+<script src="http://www.relaxset.com/vue/vue.min.js"></script>
 <script>
+var vu=new Vue({
+	el: "#app",
+	data: {
+		title:'太仓海警支队页面和接口说明',
+		page:['general','base','mission','consult'],
+		pagesel:0,
+		data:{
+			base:[
+				{
+					name:'登录页面',url:'/login/',intro:'',ajax:['loginin'],render:[]
+				},{
+					name:'登出页',url:'/page/...',intro:'当前页面没有需要准备的接口和渲染数据，由服务端处理好清除登录SESSION[\'user_info\']及用于实现自动登录的COOKIE[\'autologin\']',ajax:[],render:[]},
+				{name:'主框架',url:'/page/...',intro:'',ajax:['useredit'],render:['account']},
+				{name:'部门管理',url:'/page/...',intro:'',ajax:['departmentadd','departmentedit','departmentdel'],render:['department']},
+				{name:'职务管理',url:'/page/...',intro:'',ajax:['jobadd','jobedit','jobdel'],render:['job']},
+				{name:'用户管理',url:'/page/...',intro:'',ajax:['useradd','useredit','userdel'],render:['user']}
+			],
+			mission:[
+				{name:'工作概览',url:'/page/...',intro:'',ajax:['statsMission','statsMissionDetails'],render:[]},
+				{name:'任务列表',url:'/page/...',intro:'',ajax:[],render:[]}
+			],
+			consult:[
+				{name:'工作概览',url:'/page/...',intro:'',ajax:['statsConsult'],render:[]},
+				{name:'请示列表',url:'/page/...',intro:'',ajax:['consultadd','consultlist','consultedit','consultdel','consultreply','consultReplyList'],render:['department']}
+			]
+		},
+		ajaxSource:{
+			'loginin':{
+				name:'用户登录接口',url:'/page/login',key:[
+					{txt:'username',rq:1,def:'',intro:'用户名'},
+					{txt:'password',rq:1,def:'',intro:'用户密码[MD5]'},
+					{txt:'auto',rq:0,def:'0',intro:'[1|0] 1自动登录，0普通登录，如果无该值则默认0'}
+				],intro:''
+			},
+			'useredit':{
+				name:'编辑用户信息',url:'/page/login',key:[
+					{txt:'uid',rq:1,def:'',intro:'用户id'},
+					{txt:'password',rq:0,def:'',intro:'原始密码[MD5]'},
+					{txt:'newpassword',rq:0,def:'',intro:'新密码[MD5]'},
+					{txt:'realname',rq:1,def:'空字符',intro:'姓名'},
+					{txt:'telnumber',rq:1,def:'空字符',intro:'电话号码'},
+				],intro:'1.除非管理员，其他账户修改密码必须传递password，且传递的这个字符必须与数据库中该用户的password一致，如果不传递则默认为不修改密码\n2.当前不开放用户类型，部门，职务的修改\n3.非管理员账户只能修改自己的用户信息'
+			},
+			'departmentadd':{
+				name:'增加部门',url:'/page/login',key:[
+					{txt:'pname',rq:1,def:'',intro:'部门名称'},
+					{txt:'plevel',rq:1,def:'',intro:'部门对应的级别'}
+				],intro:'1.不能添加plevel=0的部门\n2.部门名称在当前级别不能有重复'
+			},
+			'departmentedit':{
+				name:'部门资料编辑',url:'/page/login',key:[
+					{txt:'pid',rq:1,def:'',intro:'部门id'},
+					{txt:'pname',rq:1,def:'',intro:'部门名称'}
+				],intro:'1.部门名称在当前级别不能有重复'
+			},
+			'departmentdel':{
+				name:'删除部门',url:'/page/login',key:[
+					{txt:'pid',rq:1,def:'',intro:'部门id'}
+				],intro:'1.不能删除plevel=0的部门\n2.该部门对应有用户则不能删除\n3.该部门对应有任务或者请示数据则不能删除'
+			},
+			'jobadd':{
+				name:'添加职务',url:'/page/login',key:[
+					{txt:'jname',rq:1,def:'',intro:'职务名称'},
+					{txt:'pid',rq:1,def:'',intro:'职务对应部门id'},
+				],intro:'1.请判断当前的部门id是否存在，不存在无法添加\n2.职务名称不能重复'
+			},
+			'jobedit':{
+				name:'编辑职务',url:'/page/login',key:[
+					{txt:'jid',rq:1,def:'',intro:'职务编号'},
+					{txt:'jname',rq:1,def:'',intro:'职务名称'},
+					{txt:'pid',rq:1,def:'',intro:'职务对应部门id'},
+				],intro:'1.请判断当前的部门id是否存在，不存在无法添加\n2.职务名称不能重复'
+			},
+			'jobdel':{
+				name:'删除职务',url:'/page/login',key:[
+					{txt:'jid',rq:1,def:'',intro:'职务编号'}
+				],intro:'1.判定是否有该职务用户，有则不能删除'
+			},
+			'useradd':{
+				name:'添加用户',url:'/page/login',key:[
+					{txt:'username',rq:1,def:'',intro:'用户名'},
+					{txt:'password',rq:1,def:'',intro:'用户密码'},
+					{txt:'tid',rq:1,def:'',intro:'用户类型id'},
+					{txt:'pid',rq:1,def:'',intro:'部门id，用户类型为支队领导，pid为0'},
+					{txt:'jid',rq:1,def:'',intro:'职务id，用户类型为支队领导或者上级用户，jid为0'},
+					{txt:'realname',rq:1,def:'空字符',intro:'用户的姓名'},
+					{txt:'telnumber',rq:1,def:'空字符',intro:'电话号码'}
+				],intro:''
+			},
+			'userdel':{
+				name:'删除用户',url:'/page/login',key:[
+					{txt:'uid',rq:1,def:'',intro:'用户id'}
+				],intro:'1.如果该用户发生过业务数据，无法删除'
+			},
+			'statsConsult':{
+				name:'请示统计',url:'/page/login',key:[
+					{txt:'uid',rq:1,def:'',intro:'用户id'}
+				],intro:'返回数据\n{\nall: 请示总数，不包含撤销的请示,\ndoing: 正在进行中的请示数量,\nremove: 撤销的请示数量\n}'
+			},
+			'statsMission':{
+				name:'任务统计',url:'/page/login',key:[
+					{txt:'uid',rq:1,def:'',intro:'用户id'}
+				],intro:'返回数据\n{\nall: 任务总数，不包含撤销的任务,\ndoing: 正在进行中的任务数量,\nremove: 撤销的任务数量\ntimeout: 超时的任务数量\nfirst: 首次完成的任务数量，可以按状态和回复数量进行判定\nwait: 已提交待审核的数量\n}'
+			},
+			'statsMissionDetails':{
+				name:'分部门的任务统计',url:'/page/login',key:[
+					{txt:'uid',rq:1,def:'',intro:'用户id'}
+				],intro:'返回数据\n{\n部门名称:{\n all: 任务总数，不包含撤销的任务,\n doing: 正在进行中的任务数量,\n remove: 撤销的任务数量\n timeout: 超时的任务数量\n first: 首次完成的任务数量，可以按状态和回复数量进行判定\n wait: 已提交待审核的数量\n }...\n}'
+			},
+			'consultadd':{
+				name:'添加请示',url:'/consult/add_consult',key:[
+					{txt:'title',rq:1,def:'',intro:'请示标题'},
+					{txt:'content',rq:1,def:'',intro:'请示内容'},
+					{txt:'annex',rq:0,def:'空字符',intro:'请示对应的附件,可以包含多个附件，附件的提交形式应该是个对象数组，如[{type:0,url:...,name:},...] 请中type=0表示该附件是自定义url的，type=1则表示使用ftp服务器的默认地址'},
+					{txt:'pid',rq:1,def:'',intro:'请示发送给哪个部门的部门id'}
+				],intro:''
+			},
+			'consultlist':{
+				name:'请示列表',url:'/consult/consult_list',key:[
+					{txt:'create_uid',rq:0,def:'',intro:'发起人?'},
+					{txt:'status',rq:0,def:'',intro:'状态 0待接受 1处理中 2完成 3撤销'},
+					{txt:'start_date',rq:0,def:'空字符',intro:'过滤发布日期开始'},
+					{txt:'end_date',rq:0,def:'空字符',intro:'过滤发布日期结束'},
+					{txt:'page',rq:0,def:'1',intro:'分页页码'},
+					{txt:'pagesize',rq:0,def:'15',intro:'分页每页的数量'}
+				],intro:'返回数据\n{\n id,\n title,\n content,\n uid,\n annex:[{type,url,name},...]\n act_user:??,\n create_date,\n check_status\n}'
+			},
+			'consultedit':{
+				name:'修改请示信息',url:'/consult/edit_consult',key:[
+					{txt:'cid',rq:1,def:'',intro:'请示id'},
+					{txt:'title',rq:1,def:'',intro:'请示标题'},
+					{txt:'content',rq:1,def:'',intro:'请示内容'},
+					{txt:'annex',rq:0,def:'空字符',intro:'请示对应的附件'},
+					{txt:'pid',rq:1,def:'',intro:'请示发送给哪个部门的部门id'}
+				],intro:''
+			},
+			'consultreply':{
+				name:'回复请示',url:'/consult/replies_consult',key:[
+					{txt:'cid',rq:1,def:'',intro:'请示id'},
+					{txt:'content',rq:1,def:'',intro:'回复内容'},
+					{txt:'complete',rq:1,def:'1',intro:'请示是否完成 1完成 0未完成'}
+				],intro:''
+			},
+			'consultdel':{
+				name:'删除/撤销请示',url:'/consult/del_consult',key:[
+					{txt:'cid',rq:1,def:'',intro:'请示id'}
+				],intro:''
+			},
+			'consultReplyList':{
+				name:'请示回复列表',url:'/consult/consult_replies',key:[
+					{txt:'cid',rq:1,def:'',intro:'请示id'},
+					{txt:'page',rq:0,def:'1',intro:'分页页码'},
+					{txt:'pagesize',rq:0,def:'15',intro:'分页每页的数量'}
+				],intro:''
+			}
+		},
+		renderSource:{
+			'account':{
+				name:'[对象] 当前登录用户信息',va:'$account',key:[
+					{txt:'uid',rq:1,intro:'用户id'},
+					{txt:'username',rq:1,intro:'用户名'},
+					{txt:'pid',rq:1,intro:'部门编号'},
+					{txt:'pname',rq:1,intro:'部门名称，如果pid是0，则这里返回空字符串'},
+					{txt:'jid',rq:1,intro:'职务编号'},
+					{txt:'jname',rq:1,intro:'职务名称，如果jid是0，则这里返回空字符串'},
+					{txt:'tid',rq:1,intro:'用户类型编号'},
+					{txt:'tname',rq:1,intro:'用户类型名称'},
+					{txt:'realname',rq:1,intro:'用户姓名，为空则返回空字符串'},
+					{txt:'telnumber',rq:1,intro:'联系电话，为空则返回空字符串'}
+				],intro:''
+			},
+			'department':{
+				name:'[数组] 部门信息列表',va:'$department',key:[
+					{txt:'pid',rq:1,intro:'部门id'},
+					{txt:'pname',rq:1,intro:'部门名称'},
+					{txt:'plevel',rq:1,intro:'部门级别'}
+				],intro:''
+			},
+			'job':{
+				name:'[数组] 职务信息列表',va:'$job',key:[
+					{txt:'jid',rq:1,intro:'职务id'},
+					{txt:'jname',rq:1,intro:'职务名称'},
+					{txt:'pid',rq:1,intro:'职务对应的部门id'}
+				],intro:''
+			},
+			'user':{
+				name:'[数组] 用户列表信息',va:'$user',key:[
+					{txt:'uid',rq:1,intro:'用户id'},
+					{txt:'username',rq:1,intro:'用户名'},
+					{txt:'tid',rq:1,intro:'用户类型id'},
+					{txt:'tname',rq:1,intro:'用户类型名称'},
+					{txt:'pid',rq:1,intro:'所在部门id'},
+					{txt:'pname',rq:1,intro:'部门名称，如果pid为0则这里为空字符'},
+					{txt:'jid',rq:1,intro:'职务id'},
+					{txt:'jname',rq:1,intro:'职务名称，如果jid未0则这里为空字符'},
+					{txt:'realname',rq:1,intro:'姓名'},
+					{txt:'telnumber',rq:1,intro:'联系电话'}
+				],intro:''
+			}
+		}
+	},
+	methods:{
+		viewpage: function(pageStr){
+			var index=this.page.indexOf(pageStr);
+			this.pagesel=index;
+		}
+	}
+});
 </script>
 </body>
 </html>
