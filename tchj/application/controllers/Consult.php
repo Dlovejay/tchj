@@ -31,6 +31,7 @@ class Consult extends MY_Controller
 //        $field = '*';
 //        $result = $this->ConsultList->query($where, $field, $this->limit, $offset);
 //        $data['result'] = $result;
+        # 部门,用户数据
         $this->load->view('consult/index.php',$data);
     }
 
