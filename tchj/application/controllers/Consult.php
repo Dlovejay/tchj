@@ -12,25 +12,12 @@ class Consult extends MY_Controller
             'base_url' => $this->config->item('base_url')
         );
 
-        //加载用户model
+        # 发送请示指向的部门
         $this->load->model('ConsultList');
-        $data['total'] = $this->ConsultList->query_total();
+        $where = ['plevel' => 1];
+        $departments = $this->db->where($where)->select('pid, pname')->get('department', 0, 0);
+        $data['departments'] = $departments->result_array();
 
-//        $this->load->library('pagination');
-//        $config['base_url'] = base_url('consult/index');
-//        $config['total_rows'] = $data['total'];
-//        $config['per_page'] = $this->limit;
-//        $this->pagination->initialize($config);
-
-//        $offset =  $this->uri->segment(3);
-//        if (empty($offset)) {
-//            $offset = 0;
-//        }
-//
-//        $where = [];
-//        $field = '*';
-//        $result = $this->ConsultList->query($where, $field, $this->limit, $offset);
-//        $data['result'] = $result;
         # 部门,用户数据
         $this->load->view('consult/index.php',$data);
     }
@@ -45,27 +32,26 @@ class Consult extends MY_Controller
         $page = intval($this->input->get('page'));
         $page_size = intval($this->input->get('page_size'));
 
-        $user_info = $this->session->userdata('user_info');
+        $user_info = $this->session->userdata('user');
         # 就不做校验了  对于不合法的数据 当成没有这个条件
-        $where = ' pid = ' . $user_info['pid'];
+        $where = ' c.pid = ' . $user_info['pid'];
         if(!empty($create_uid)){
-            $where .= ' AND uid = ' . $create_uid;
+            $where .= ' AND c.uid = ' . $create_uid;
         }
         if(!empty($status)){
-            $where .= ' AND check_status = ' . $status;
+            $where .= ' AND c.check_status = ' . $status;
         }
         if(!empty($start_date) && strtotime($start_date)){
-            $where .= ' AND create_date >= "' . $start_date . '"';
+            $where .= ' AND c.create_date >= "' . $start_date . '"';
         }
         if(!empty($end_date) && strtotime($end_date)){
-            $where .= ' AND create_date <= "' . $end_date . '"';
+            $where .= ' AND c.create_date <= "' . $end_date . '"';
         }
 
         # 还需要看用户是什么级别,如果不是领导 那就只能看自己发布的请示
         if($user_info['tid'] == USERD){
-            $where .= ' AND uid = ' . $user_info['uid'];
+            $where .= ' AND c.uid = ' . $user_info['uid'];
         }
-
         if(!empty($page)){
             $page = 1;
         }
@@ -87,27 +73,8 @@ class Consult extends MY_Controller
         exit();
     }
 
-    # 添加请示
-    public function add_consult()
-    {
-        # 个人信息
-        $user_info = $this->session->userdata('user_info');
-
-        # 发送请示指向的部门
-        $this->load->model('ConsultList');
-        $where = ['plevel' => 1];
-        $result = $this->ConsultList->query($where, 'pid, pname', 10, 0, 'department');
-
-        $data = array(
-            'user_info' => $user_info,
-            'department' => $result
-        );
-
-        $this->load->view('consult/add.php',$data);
-    }
-
     # 处理添加请示
-    public function do_add_consult()
+    public function add_consult()
     {
         $title = trim($this->input->post('title'));
         $content = trim($this->input->post('content'));
@@ -116,7 +83,7 @@ class Consult extends MY_Controller
 
         $return = rexGetMReturn();
 
-        $user_info = $this->session->userdata('user_info');
+        $user_info = $this->session->userdata('user');
         # 只有普通用户才能发布请示
         if($user_info['tid'] != USERD){
             $return['code'] = 401;
@@ -175,9 +142,9 @@ class Consult extends MY_Controller
             exit();
         }
         $this->load->model('ConsultList');
-        $user_info = $this->session->userdata('user_info');
+        $user_info = $this->session->userdata('user');
 
-        $consolt_info = $this->ConsultList->query('id = ' . $id);
+        $consolt_info =  $this->db->where('id', $id)->get('consultlist')->result_array();
         if(empty($consolt_info) || $consolt_info[0]['uid'] != $user_info['uid']){
             $return['code'] = 401;
             $return['message'] = '您没有权限修改他人的请示';
@@ -228,7 +195,7 @@ class Consult extends MY_Controller
             echo json_encode($return);
             exit();
         }
-        $user_info = $this->session->userdata('user_info');
+        $user_info = $this->session->userdata('user');
 
         $this->load->model('ConsultList');
 
@@ -265,10 +232,16 @@ class Consult extends MY_Controller
             if($complete == 1){
                 $status = 2;
             }
+            # 请示批示人
+            $act_user = 0;
+            if($user_info['tid'] != USERD){
+                $act_user = $user_info['uid'];
+            }
             # 请示插入成功 将consultlist表的rcount字段+1
             $this->db->where('id', $cid);
-            $this->db->set('rcount', 'rcount + 1', FALSE);
-            $this->db->set('status', $status, FALSE);
+            $this->db->set('rcount', 'rcount + 1', false);
+            $this->db->set('status', $status, false);
+            $this->db->set('act_user', $act_user, false);
             $this->db->update('consultlist');
         }else{
             $return['code'] = 401;
@@ -283,7 +256,7 @@ class Consult extends MY_Controller
     public function del_consult()
     {
         $cid = intval($this->input->post('cid'));
-        $user_info = $this->session->userdata('user_info');
+        $user_info = $this->session->userdata('user');
 
         # 随便载入一个model
         $this->load->model('ConsultList');
@@ -324,7 +297,16 @@ class Consult extends MY_Controller
         $cid = intval($this->input->get('cid'));
         $page = intval($this->input->get('page'));
         $page_size = intval($this->input->get('page_size'));
-        $user_info = $this->session->userdata('user_info');
+        $user_info = $this->session->userdata('user');
+
+        $return = rexGetMReturn();
+        if(empty($cid)){
+            $return['code'] = 401;
+            $return['message'] = '请示id不能为空';
+
+            echo json_encode($return);
+            exit();
+        }
 
         # 随便载入一个model
         $this->load->model('ConsultList');
@@ -355,7 +337,7 @@ class Consult extends MY_Controller
             $page_size = 10;
         }
         $offset = ($page - 1) * $page_size;
-        $result = $this->ConsultList->query($where, '*', $page_size, $offset, 'consultreturn');
+        $result = $this->ConsultList->query($where, '*', $page_size, $offset, 'consultreturn c');
 
         $return['data'] = $result;
 
