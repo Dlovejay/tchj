@@ -4,7 +4,7 @@ var vu=new Vue({
 		user: JSON.array2Object(JSON.parse($("#user").text()),'uid'),
 		department: JSON.array2Object(JSON.parse($("#department").text()),'pid'),
 		me: JSON.parse($("#account").text()),
-		ftp: $('#FTP').text(),
+		ftp:'ftp://192.168.1.104:21/',
 		op:'',    //操作类型 add添加操作 edit修改操作
 		list:[],  //任务列表信息
 		reflist:{}, //mid对照表,
@@ -61,6 +61,48 @@ var vu=new Vue({
 				if (this.department[x].plevel=='2') tempArray.push(this.department[x]);
 			}
 			return tempArray;
+		},
+		bs1: function(){  //检查回复
+			if (this.viewobj){
+				if (this.viewobj.status==2 || this.viewobj.status==5){
+					if (this.viewobj.passid=='0'){
+						if (this.viewobj.authorid!=this.me.uid) return true;
+					}else{
+						var temp=this.viewobj.passid.split(',');
+						if (temp.indexOf(this.me.pid+'')>=0) return true;
+					}
+				}else if(this.viewobj.status==3){
+					if (this.me.uid==this.viewobj.authorid) return true;
+				}
+			}
+			return false;
+		},
+		bs2: function(){ //检查撤销
+			if (this.viewobj){
+				if (this.viewobj.authorid==this.me.uid && (this.viewobj.status==2 || this.viewobj.status==3 || this.viewobj.status==5)) return true;
+			}
+			return false;
+		},
+		bs3: function(){ //检查删除
+			if (this.viewobj){
+				if (this.viewobj.authorid==this.me.uid && (this.viewobj.status==0 || this.viewobj.status==1)) return true;
+			}
+			return false;
+		},
+		bs4: function(){ //检查接受
+			if (this.viewobj && this.viewobj.status==1){
+				if (this.viewobj.passid=='0'){
+					if (this.viewobj.authorid!=this.me.uid) return true;
+				}else{
+					var temp=this.viewobj.passid.split(',');
+					if (temp.indexOf(this.me.pid+'')>=0) return true;
+				}
+			}
+			return false;
+		},
+		bs5: function(){ //是否可编辑任务
+			if (this.viewobj && (this.viewobj.status==0 || this.viewobj.status==1) && this.viewobj.authorid==this.me.uid) return true;
+			return false;
 		}
 	},
 	methods:{
@@ -352,6 +394,9 @@ var vu=new Vue({
 		if (this.me.tid==CFG.UL || this.me.tid==CFG.UU){
 			this.isPublic=true;
 		}
+		if (this.me.tid==CFG.UL){
+			this.isChoose=true;
+		}
 	},
 	watch:{
 		//输入项变更则取消错误提示信息
@@ -477,12 +522,9 @@ ajaxre.success=function(data){
 			}
 			temp[i].username=vu.user[temp[i].uid].username;
 		}
-		Vue.set(vu.returnList,vu.viewobj.mid,{
-                  parent:this.edit.Model.brand,
-                  children:[]
-                });
-								
-								vu.returnList[vu.viewobj.mid]=temp;
+		Vue.set(vu.returnList,vu.viewobj.mid,temp);
+		//vu.returnList[vu.viewobj.mid]=temp;
+		//console.log(vu.returnList);
 	}
 };
 

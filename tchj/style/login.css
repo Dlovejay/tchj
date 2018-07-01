@@ -8,16 +8,7 @@ h2 .ver{ color:#ce1125;}
 .content{ background-color:#fff; height:calc(100% - 176px); display:flex;}
 .loginForm{ margin:auto; width:100%;}
 .loginForm>*{ display:block; width:30%; min-width:240px; margin:12px auto;}
-.loginForm .tipMessage{ padding:0 5px; width:100%; text-align:center; visibility:hidden;}
-.tipMessage span{ display:inline-block; width:100%; line-height:2.4em;}
-.tipMessage.loading{ color:#999; background-color:#fff; visibility:visible;}
-.tipMessage.loading span:before{ display:inline-block; vertical-align:middle; content:""; height:1.8em; width:1.8em; background:url(/style/images/loading.gif) no-repeat; background-size:contain;}
-.tipMessage.warning{ background-color:#ffe555; color:#333; visibility:visible;}
-.tipMessage.warning .fa{ color:#e27a00;}
-.tipMessage.error{ background-color:#ffdcdc; color:#9b0202; visibility:visible;}
-.tipMessage.error .fa{ color:red;}
-.tipMessage.ok{ background-color:#d7ffdb; color:#333; visibility:visible;}
-.tipMessage.ok .fa{ color:green;}
+.loginForm .tipMessage{ padding:0 5px; width:100%; text-align:center;}
 .loginForm .rexButton{ width:100%;}
 .loginForm .rexCheck{ text-align:center; margin:0 auto;}
 .rexField.fa .rexInput{ padding-left:3.5em;}

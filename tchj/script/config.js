@@ -1,20 +1,32 @@
 //公用配置文件
 //调试开关
 "use strict";
-//var rexBug=true;
-//var rexLocal=false;
 //相关配置
 var CFG={
-	//server: "http://127.0.0.1/index.php/",
 	ver: "Ver1.0",
-	cut: 20  //分页数量
+	UM:1,
+	UL:2,
+	UU:3,
+	UD:4,
+	pagesize: 20,  //分页数量
 };
-
-/*
-if (rexLocal){
-	CFG.server="/server/"
-}
-*/
+var URL={  //本站URL地址
+	loginin:'/index.php/login/loginin/',
+	loginout:'/index.php/loginout/',
+	home:'/index.php/home/',
+	department:'/rextest/department',
+	job:'/rextest/job',
+	user:'/rextest/user',
+	overview:'/rextest/overview',
+	mission:'/rextest/mission',
+	missionlist:'/rextest/missionlist',
+	missionadd:'/rextest/missionadd',
+	returnlist:'/rextest/returnlist',
+	consult:'/rextest/consult',
+	consultlist:'/rextest/consultlist',
+	consultadd:'/rextest/consultadd',
+	consultreturn:'/rextest/consultreturn'
+};
 //正则字典
 var REG={
 	uname:/^\w{3,30}$/, //用户名

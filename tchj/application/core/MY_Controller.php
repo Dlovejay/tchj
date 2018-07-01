@@ -1,23 +1,35 @@
 <?php
-
-class MY_Controller extends CI_Controller
-{
-    private $userLogin=false;    //标志用户登录状态
+//公共父类
+class MY_Controller extends CI_Controller{
+    protected $userLogin=false;    //标志用户登录状态
     protected $limit = 3;      //分页每页显示条数
     //ajax返回的错误标志 403权限问题 401客户端数据问题 440未登录 500服务端错误...
 
     public function __construct(){
         parent::__construct();
         $this->load->library('session');
-        $this->check_login();
+        $this->checkLogin();
     }
 
-    protected function check_login()
-    {
-        $user_info = $this->session->userdata('user');
-        if (empty($user_info)){
-            redirect(base_url('login/index'));
-        }
+    protected function checkLogin(){
+			if (isset($_SESSION['expiretime'])){
+				if ($_SESSION['expiretime']>time()){
+					if (isset($_SESSION['user'])){
+						$this->session->set_userdata('expiretime',time()+REXSESSIONLIFE);
+						if (isset($_COOKIE['autologin'])){
+							setcookie('autologin',$_COOKIE['autologin'],time()+REXSESSIONLIFE,'/');
+						}
+						$this->userLogin=true;
+						return;
+					}
+				}
+			}
+			if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])!='xmlhttprequest'){
+				redirect(base_url('login/'));
+			}else{
+				rexAjaxReturn('440','当前用户未登录，请刷新页面重新登录');
+				exit();
+			}
     }
 
     //检查当前操作的权限

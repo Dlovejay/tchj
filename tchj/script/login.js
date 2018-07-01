@@ -1,126 +1,96 @@
 var vu = new Vue({
   el: "#app",
-  data: {
-    uname: "",
-    upwd: "",
-		auto: true,
-		cfg: CFG,
-    regDic: {
-      uname: {
-        reg: REG.uname,
-        message: "请正确填写用户名",
-        chk: false
-      },
-      upwd: {
-        reg: REG.upwd,
-        message: "请正确填写登录密码",
-        chk: false
-      }
-    },
-    login: false,
-    mtype: "",
-    message: ""
+  data:{
+		ver:CFG.ver,
+		login:{
+			username:'',
+			password:'',
+			auto:1
+		},
+		chk:'',
+    load: false
   },
-	computed: {
-		tipClass: function(){
-			switch(this.mtype){
-				case "warning":
-					return "fa-info-circle";
-				case "error":
-					return "fa-times-circle-o";
-				case "ok":
-					return "fa-check-circle-o";
-				default:
-					return "";
-			}
-		}
+	computed:{
 	},
-  methods: {
-    //验证登录信息
-    checkSubmit: function(type){
-      var checkArray = [];
-      if (type) {
-        checkArray.push(type);
-      } else {
-        checkArray = ['uname','upwd'];
-      }
-      var key;
-      var flag=[];
-      for (var i=0; i<checkArray.length; i++) {
-        key=checkArray[i];
-        if (this[key]!=="" && this.regDic[key]["reg"].test(this[key])===false){
-          this.regDic[key]["chk"]=true;
-          flag.push(key);
-        }else{
-          this.regDic[key]["chk"]=false;
-        }
-      }
-      if (flag.length===1) {
-        this.message=this.regDic[flag[0]]["message"];
-        this.mtype="warning";
-        return false;
-      }else{
-        flag=[];
-        for (var x in this.regDic){
-          if (this.regDic[x]["chk"]===true){
-            flag.push(x);
-          }
-        }
-        if (flag.length===0){
-          this.message="";
-          this.mtype="";
-          return true;
-        }else{
-          if (flag.length===1){
-            this.message=this.regDic[flag[0]]["message"];
-          }else{
-            this.message="请检查以下出错项目";
-          }
-          this.mtype = "warning";
-          return false;
-        }
-      }
-    },
+  methods:{
+		_getChkobj: function(num){  //获得检查对象
+			var tempArray=[];
+			for (var i=0; i<num; i++){
+				tempArray.push({
+					flag:'',
+					msg:'',
+					obj:''
+				});
+			}
+			return tempArray;
+		},
+		setChk: function(index,flag,msg,obj){ //设置提示信息
+			if (!this.chk[index]) return;
+			var temp=this.chk[index];
+			temp.flag=flag;
+			temp.msg=msg;
+			if (obj){
+				temp.obj=obj;
+			}else{
+				temp.obj='';
+			}
+		},
+		clearChk: function(index){ //清除提示信息
+			if (index===undefined){
+				for (var i=0; i<this.chk.length; i++){
+					var temp=this.chk[i];
+					for (var x in temp){
+						temp[x]='';
+					}
+				}
+			}else if(!this.chk[index]){
+				return;
+			}else{
+				for (var x in this.chk[index]){
+					this.chk[index][x]='';
+				}
+			}
+		},
     //登录判定
     doLogin: function(){
-      if (this.login) return;
-      if (this.checkSubmit()===false) return;
-      if (this.uname==="" || this.upwd==="") {
-        this.mtype="warning";
-        this.message="请先把登录信息填写完整";
-        return;
-      }
-      ajax.data = {
-        username: this.uname,
-        password: this.upwd,
-        auto: this.auto?1:0
-      };
+      if (this.load) return;
+			if (this.login.username==''){
+				this.setChk(0,'warning','请填写用户名信息','username');
+				return;
+			}
+			if (this.login.password==''){
+				this.setChk(0,'warning','请填写登录密码信息','password');
+				return;
+			}
+			if (REG.uname.test(this.login.username)==false){
+				this.setChk(0,'warning','用户名只能是英文字符或者数字的组合','username');
+				return;
+			}
+			if (REG.uname.test(this.login.password)==false){
+				this.setChk(0,'warning','密码只能是英文字符，数字和特殊字符-+#@%的组合','password');
+				return;
+			}
+      ajax.data={
+				username: this.login.username,
+				password: md5(this.login.password),
+				auto: this.login.auto? this.login.auto:'0'
+			};
       ajax.send();
     },
-    //传送登录信息
-    sendLogin: function () {
-      this.login = true;
-      this.mtype = "loading";
-      this.message = "正在登录，请稍后......";
-    },
     //ajax返回设置
-    getReturn: function (data, code, msg){
-      if (code!==undefined){
-				this.login=false;
-        this.mtype="error";
-        this.message=msg;
+    getReturn: function(data){
+      if (data.code){
+				this.load=false;
+				if (data.code='450'){  //约定好用户名密码错误
+					this.setChk(0,'alert',data.message,'all');
+				}else{
+					this.setChk(0,'alert',data.message);
+				}
       }else{
-        if (data.code!==0){
-					this.login=false;
-          this.mtype="error";
-          this.message=data.message;
-        }else{
-          this.mtype="ok";
-          this.message="身份确认，登录成功，正在跳转请稍等...";
-          setTimeout(function(){
-						location.href = CFGURL + 'page/index';
-					},1000);
-        }
+				this.setChk(0,'ok','登录成功，正在跳转请稍等...');
+				setTimeout(function(){
+					top.location.href=URL.home;
+				},800);
       }
     },
     //遍历到下一个输入框
@@ -128,21 +98,33 @@ var vu = new Vue({
       $(".loginForm input").eq(index).focus();
     }
   },
+	created:function(){
+		this.chk=this._getChkobj(1);
+	},
   watch:{
-    uname: function(){
-      this.checkSubmit("uname");
-    },
-    upwd: function(){
-      this.checkSubmit("upwd");
-    }
+		//输入项变更则取消错误提示信息
+		'login.username':function(newVal){
+			if (this.chk[0].obj=='username' || this.chk[0].obj=='all'){
+				this.clearChk(0);
+			}
+		},
+		'login.password':function(newVal){
+			if (this.chk[0].obj=='password' || this.chk[0].obj=='all'){
+				this.clearChk(0);
+			}
+		}
   }
 });
 
 var ajax = new relaxAJAX();
-ajax.url= CFGURL + '/login/loginin';
-ajax.before=vu.sendLogin;
+ajax.url=URL.loginin;
+ajax.before=function(){
+	vu.load=true;
+	vu.setChk(0,'loading','正在提交登录信息，请稍等...');
+};
 ajax.error=function(code, msg){
-  vu.getReturn("", code, msg);
+	vu.load=false;
+  vu.setChk(0,'alert',code+' '+msg);
 };
 ajax.success=function(data){
   vu.getReturn(data);
