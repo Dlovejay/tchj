@@ -12,7 +12,7 @@ class Login extends CI_Controller
         if ($this->userLogin==false){
             $this->load->view('pages/login.php',$data);
         }else{
-            $data['user']=rexGetSession('user');
+            $data['user'] = $this->session->userdata('user');
             $this->load->view('pages/main.php',$data);
         }
     }
@@ -42,7 +42,7 @@ class Login extends CI_Controller
             $return['message']='用户名或者密码错误';
         }
         # 登录成功 种session
-        $this->session->set_userdata(array('user_info' => $result[0]));
+        $this->session->set_userdata(array('user' => $result[0]));
         echo json_encode($return);
     }
 }

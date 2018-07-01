@@ -14,7 +14,7 @@ class MY_Controller extends CI_Controller
 
     protected function check_login()
     {
-        $user_info = $this->session->userdata('user_info');
+        $user_info = $this->session->userdata('user');
         if (empty($user_info)){
             redirect(base_url('login/index'));
         }
@@ -30,7 +30,7 @@ class MY_Controller extends CI_Controller
             'message'=>''
         );
 
-        $user = $this->session->userdata('user_info');
+        $user = $this->session->userdata('user');
         if (count($usertype)>0){
             if (in_array($user['tid'],$usertype)==false){
                 $return['code']='403';
