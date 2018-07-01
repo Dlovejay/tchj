@@ -44,8 +44,9 @@ class Consult extends MY_Controller
         $page = intval($this->input->get('page'));
         $page_size = intval($this->input->get('page_size'));
 
+        $user_info = $this->session->userdata('user_info');
         # 就不做校验了  对于不合法的数据 当成没有这个条件
-        $where = ' 1 = 1 ';
+        $where = ' pid = ' . $user_info['pid'];
         if(!empty($create_uid)){
             $where .= ' AND uid = ' . $create_uid;
         }
@@ -60,8 +61,7 @@ class Consult extends MY_Controller
         }
 
         # 还需要看用户是什么级别,如果不是领导 那就只能看自己发布的请示
-        $user_info = $this->session->userdata('user_info');
-        if($user_info['tid'] != USERD){
+        if($user_info['tid'] == USERD){
             $where .= ' AND uid = ' . $user_info['uid'];
         }
 
@@ -89,16 +89,36 @@ class Consult extends MY_Controller
     # 添加请示
     public function add_consult()
     {
+        # 个人信息
+        $user_info = $this->session->userdata('user_info');
+
+        # 发送请示指向的部门
+        $this->load->model('ConsultList');
+        $where = ['plevel' => 1];
+        $result = $this->ConsultList->query($where, 'pid, pname', 10, 0, 'department');
+
+        $data = array(
+            'user_info' => $user_info,
+            'department' => $result
+        );
+
+        $this->load->view('consult/add.php',$data);
+    }
+
+    # 处理添加请示
+    public function do_add_consult()
+    {
         $title = trim($this->input->post('title'));
         $content = trim($this->input->post('content'));
         $annex = trim($this->input->post('annex'));
+        $pid = trim($this->input->post('pid'));
 
         $return = rexGetMReturn();
 
         $user_info = $this->session->userdata('user_info');
         # 只有普通用户才能发布请示
         if($user_info['tid'] != USERD){
-            $return['code'] = 12;
+            $return['code'] = 401;
             $return['message'] = '您无权发布请示';
 
             echo json_encode($return);
@@ -106,7 +126,7 @@ class Consult extends MY_Controller
         }
 
         if(empty($title) || empty($content)){
-            $return['code'] = 10;
+            $return['code'] = 401;
             $return['message'] = '参数不能为空';
 
             echo json_encode($return);
@@ -119,14 +139,15 @@ class Consult extends MY_Controller
             'content' => $content,
             'annex' => $annex,
             'uid' => $user_info['uid'],
-            'status' => 0
+            'status' => 0,
+            'pid' => $pid
         );
 
         if($this->db->insert('consultlist', $data)){
             $id = $this->db->insert_id();
             $return['data'] = $id;
         }else{
-            $return['code'] = 11;
+            $return['code'] = 401;
             $return['message'] = '发表请示失败,请重试';
         }
 
@@ -141,11 +162,12 @@ class Consult extends MY_Controller
         $title = trim($this->input->post('title'));
         $content = trim($this->input->post('content'));
         $annex = trim($this->input->post('annex'));
+        $pid = trim($this->input->post('pid'));
 
         $return = rexGetMReturn();
 
         if(empty($title) || empty($content)){
-            $return['code'] = 10;
+            $return['code'] = 401;
             $return['message'] = '参数不能为空';
 
             echo json_encode($return);
@@ -156,7 +178,7 @@ class Consult extends MY_Controller
 
         $consolt_info = $this->ConsultList->query('id = ' . $id);
         if(empty($consolt_info) || $consolt_info[0]['uid'] != $user_info['uid']){
-            $return['code'] = 12;
+            $return['code'] = 401;
             $return['message'] = '您没有权限修改他人的请示';
 
             echo json_encode($return);
@@ -164,7 +186,7 @@ class Consult extends MY_Controller
         }
 
         if($consolt_info[0]['status'] != 0){
-            $return['code'] = 13;
+            $return['code'] = 401;
             $return['message'] = '请示已被接收,无法修改';
 
             echo json_encode($return);
@@ -174,12 +196,13 @@ class Consult extends MY_Controller
         $data = array(
             'title' => $title,
             'content' => $content,
-            'annex' => $annex
+            'annex' => $annex,
+            'pid' => $pid
         );
 
         $this->db->where('id', $id);
         if(!$this->db->update('consultlist', $data)){
-            $return['code'] = 11;
+            $return['code'] = 401;
             $return['message'] = '修改请示失败,请重试';
         }
 
@@ -198,7 +221,7 @@ class Consult extends MY_Controller
         $return = rexGetMReturn();
 
         if(empty($cid) || empty($content)){
-            $return['code'] = 10;
+            $return['code'] = 401;
             $return['message'] = '参数不完整';
 
             echo json_encode($return);
@@ -211,7 +234,7 @@ class Consult extends MY_Controller
         # 查看该请示是否存在
         $consult_info = $this->db->where('id', $cid)->get('consultlist')->result_array();
         if(empty($consult_info)){
-            $return['code'] = 12;
+            $return['code'] = 401;
             $return['message'] = '该请示不存在';
 
             echo json_encode($return);
@@ -219,7 +242,7 @@ class Consult extends MY_Controller
         }
         # 有些状态是不可以回复的
         if(!in_array($consult_info[0]['status'], [0, 1])){
-            $return['code'] = 13;
+            $return['code'] = 401;
             $return['message'] = '已完成或已撤销的请示无法回复';
 
             echo json_encode($return);
@@ -247,7 +270,7 @@ class Consult extends MY_Controller
             $this->db->set('status', $status, FALSE);
             $this->db->update('consultlist');
         }else{
-            $return['code'] = 11;
+            $return['code'] = 401;
             $return['message'] = '发表请示失败,请重试';
         }
 
@@ -267,14 +290,14 @@ class Consult extends MY_Controller
 
         $return = rexGetMReturn();
         if(empty($consult_info)){
-            $return['code'] = 12;
+            $return['code'] = 401;
             $return['message'] = '该请示不存在';
 
             echo json_encode($return);
             exit();
         }
         if($consult_info[0]['uid'] != $user_info['uid']){
-            $return['code'] = 13;
+            $return['code'] = 401;
             $return['message'] = '不能操作不是自己发布的请示';
 
             echo json_encode($return);
@@ -308,7 +331,7 @@ class Consult extends MY_Controller
 
         $return = rexGetMReturn();
         if(empty($consult_info)){
-            $return['code'] = 11;
+            $return['code'] = 401;
             $return['message'] = '该请示不存在';
 
             echo json_encode($return);
@@ -317,7 +340,7 @@ class Consult extends MY_Controller
 
         # 如果是普通用户 则只能看到自己发布的请示
         if($user_info['tid'] == USERD && $consult_info[0]['uid'] != $user_info['uid']){
-            $return['code'] = 12;
+            $return['code'] = 401;
             $return['message'] = '这不是您发布的请示!';
 
             echo json_encode($return);
