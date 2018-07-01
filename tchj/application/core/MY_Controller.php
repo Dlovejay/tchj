@@ -69,4 +69,9 @@ class MY_Controller extends CI_Controller
         }
         return $return;
     }
+
+    protected function returnData($code = 0, $message = "", $data = array()) {
+        header('Content-type:text/json');
+        echo json_encode(array("code" => $code, "message" => $message, "data" => $data));
+    }
 }
