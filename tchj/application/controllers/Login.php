@@ -11,14 +11,9 @@ class Login extends CI_Controller{
 		
 	//检查用户登录状态
 	private function checkLoginStatus(){
-		if (isset($_SESSION['expiretime'])){
-			//检验SESSION是否超时
-			if ($_SESSION['expiretime']>time()){
-				if (isset($_SESSION['user'])){
-					$this->userLogin=true;
-					return;
-				}
-			}
+		if (isset($_SESSION['user'])){
+			$this->userLogin=true;
+			return;
 		}else{
 			//判断是否自动登录
 			if (isset($_COOKIE['autologin'])){
@@ -31,14 +26,12 @@ class Login extends CI_Controller{
 				}else{
 					$this->userLogin=true;
 					$this->session->set_userdata(array('user'=>$result['data']));
-					$this->session->set_userdata('expiretime',time()+REXSESSIONLIFE);
 					setcookie('autologin',$password.$username,time()+REXSESSIONLIFE,'/');
 					return;
 				}
 			}
 		}
 		unset($_SESSION['user']);
-		unset($_SESSION['expiretime']);
 		setcookie('autologin','',time()-100,'/');
 	}
 	
@@ -81,7 +74,6 @@ class Login extends CI_Controller{
 		}else{
 			# 登录成功 种session
 			$this->session->set_userdata(array('user'=>$result['data']));
-			$this->session->set_userdata('expiretime',time()+REXSESSIONLIFE);
 			if ($indata['auto']=='1'){
 				setcookie('autologin',$indata['password'].$indata['username'],time()+REXSESSIONLIFE,'/');
 			}else{

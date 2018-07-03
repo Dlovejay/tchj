@@ -12,17 +12,12 @@ class MY_Controller extends CI_Controller{
     }
 
     protected function checkLogin(){
-			if (isset($_SESSION['expiretime'])){
-				if ($_SESSION['expiretime']>time()){
-					if (isset($_SESSION['user'])){
-						$this->session->set_userdata('expiretime',time()+REXSESSIONLIFE);
-						if (isset($_COOKIE['autologin'])){
-							setcookie('autologin',$_COOKIE['autologin'],time()+REXSESSIONLIFE,'/');
-						}
-						$this->userLogin=true;
-						return;
-					}
+			if (isset($_SESSION['user'])){
+				if (isset($_COOKIE['autologin'])){
+					setcookie('autologin',$_COOKIE['autologin'],time()+REXSESSIONLIFE,'/');
 				}
+				$this->userLogin=true;
+				return;
 			}
 			if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])!='xmlhttprequest'){
 				redirect(base_url('login/'));
