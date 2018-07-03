@@ -186,6 +186,7 @@ class User extends CI_Model{
 		}
 		//是否有业务数据的判定
 		
-		$this->db->delete('user', array('id'=>$arr['uid']));
+		$this->db->delete('user', array('uid'=>$arr['uid']));
+		return $return;
 	}
 }

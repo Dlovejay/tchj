@@ -11,15 +11,21 @@ var CFG={
 	pagesize: 20,  //分页数量
 };
 var URL={  //本站URL地址
-	loginin:'/index.php/login/loginin/',
-	loginout:'/index.php/loginout/',
-	home:'/index.php/home/',
+	loginin:'/index.php/login/loginin/',  //AJAX用户登录
+	loginout:'/index.php/loginout/',      //HTTP用户登出
+	home:'/index.php/home/',              //HTTP首页
 	user:'/index.php/general/user', //HTTP用户列表页
 	useradd:'/index.php/general/useradd', //AJAX用户添加
 	useredit:'/index.php/general/useredit',  //AJAX用户资料修改
 	userdrop:'/index.php/general/userdrop',  //AJAX用户删除
-	department:'/rextest/department',
-	job:'/rextest/job',
+	department:'/index.php/general/department',  //HTTP部门管理页面
+	departmentadd:'/index.php/general/departmentadd',  //AJAX部门添加
+	departmentedit:'/index.php/general/departmentedit',  //AJAX部门修改
+	departmentdrop:'/index.php/general/departmentdrop',  //AJAX部门删除
+	job:'/index.php/general/job',  //HTTP职务管理页面
+	jobadd:'/index.php/general/jobadd', //AJAX职务添加
+	jobedit:'/index.php/general/jobedit', //AJAX职务修改
+	jobdrop:'/index.php/general/jobdrop', //AJAX职务删除
 	overview:'/rextest/overview',
 	mission:'/rextest/mission',
 	missionlist:'/rextest/missionlist',

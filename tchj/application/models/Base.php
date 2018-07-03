@@ -45,7 +45,7 @@ class Base extends CI_Model {
 			case 'add':   //增加部门信息
 				//检查名称是否重复
 				$this->db->select('pid');
-				$this->db->where('pname',$arr['text']);
+				$this->db->where('pname',$arr['pname']);
 				$this->db->from('department');
 				if ($this->db->count_all_results()>0){
 					$return['code']=500;
@@ -54,8 +54,8 @@ class Base extends CI_Model {
 				}
 				//插入数据
 				$row=array(
-					'pname'=>$arr['text'],
-					'plevel'=>$arr['level'],
+					'pname'=>$arr['pname'],
+					'plevel'=>$arr['plevel'],
 				);
 				$query=$this->db->insert('department',$row);
 				if (!$query){
@@ -68,7 +68,7 @@ class Base extends CI_Model {
 			case 'edit':   //修改部门信息 目前只允许修改部门名称
 				//检查名称是否重复
 				$this->db->select('pid');
-				$this->db->where('pname',$arr['text']);
+				$this->db->where('pname',$arr['pname']);
 				$this->db->from('department');
 				if ($this->db->count_all_results()>0){
 					$return['code']=500;
@@ -76,9 +76,9 @@ class Base extends CI_Model {
 					return $return;
 				};
 				$row=array(
-					'pname'=>$arr['text']
+					'pname'=>$arr['pname']
 				);
-				$this->db->where('pid',$arr['id']);
+				$this->db->where('pid',$arr['pid']);
 				$query=$this->db->update('department',$row);
 				if (!$query){
 					$return['code']=550;
@@ -88,10 +88,10 @@ class Base extends CI_Model {
 					$return['message']='部门信息没有被修改';
 				}
 				return $return;
-			case 'del':  //删除部门信息
+			case 'drop':  //删除部门信息
 				//检查当前部门是否已经有用户存在
 				$this->db->select('uid');
-				$this->db->where('pid',$arr['id']);
+				$this->db->where('pid',$arr['pid']);
 				$this->db->from('user');
 				if ($this->db->count_all_results()>0){
 					$return['code']=500;
@@ -99,15 +99,7 @@ class Base extends CI_Model {
 					return $return;
 				};
 				//检查当前任务权限已经含有当前部门，有则目前也不能删除
-				$this->db->select('mid');
-				$this->db->where('pid',$arr['id']);
-				$this->db->from('missiondepartment');
-				if ($this->db->count_all_results()>0){
-					$return['code']=500;
-					$return['message']='该部门下已经存在可查看的任务信息，暂时无法删除';
-					return $return;
-				};
-				$this->db->where('pid',$arr['id']);
+				$this->db->where('pid',$arr['pid']);
 				$query=$this->db->delete('department');
 				if (!$query){
 					$return['code']=550;
@@ -159,27 +151,28 @@ class Base extends CI_Model {
 			case 'add':   //增加职务信息
 				//检查对应的部门信息是否存在
 				$this->db->select('pid');
-				$this->db->where('pid',$arr['level']);
+				$this->db->where('pid',$arr['pid']);
+				$this->db->where('plevel',1);
 				$this->db->from('department');
 				if ($this->db->count_all_results()<=0){
-					$return['code']=500;
+					$return['code']=401;
 					$return['message']='职务对应的部门参数错误';
 					return $return;
 				};
-				//检查名称是否重复
+				//检查同个部门下是否有重名职务
 				$this->db->select('jid');
-				$this->db->where('jname',$arr['text']);
-				$this->db->where('pid',$arr['level']);
+				$this->db->where('jname',$arr['jname']);
+				$this->db->where('pid',$arr['pid']);
 				$this->db->from('job');
 				if ($this->db->count_all_results()>0){
-					$return['code']=500;
-					$return['message']='在该部门无法添加同样名称的职务';
+					$return['code']=401;
+					$return['message']='在该部门下已经存在该名称的职务信息';
 					return $return;
 				};
 				//插入数据
 				$row=array(
-					'jname'=>$arr['text'],
-					'pid'=>$arr['level'],
+					'jname'=>$arr['jname'],
+					'pid'=>$arr['pid'],
 				);
 				$query=$this->db->insert('job',$row);
 				if (!$query){
@@ -192,7 +185,8 @@ class Base extends CI_Model {
 			case 'edit':   //修改职务信息
 				//检查对应的部门信息是否存在
 				$this->db->select('pid');
-				$this->db->where('pid',$arr['level']);
+				$this->db->where('pid',$arr['pid']);
+				$this->db->where('plevel',1);
 				$this->db->from('department');
 				if ($this->db->count_all_results()<=0){
 					$return['code']=500;
@@ -201,19 +195,19 @@ class Base extends CI_Model {
 				}
 				//检查名称是否重复
 				$this->db->select('jid');
-				$this->db->where('jname',$arr['text']);
-				$this->db->where('pid',$arr['level']);
+				$this->db->where('jname',$arr['jname']);
+				$this->db->where('pid',$arr['pid']);
 				$this->db->from('job');
 				if ($this->db->count_all_results()>0){
 					$return['code']=500;
-					$return['message']='在该部门无法添加同样名称的职务';
+					$return['message']='在该部门下已经存在该名称的职务信息';
 					return $return;
 				};
 				$row=array(
-					'jname'=>$arr['text'],
-					'pid'=>$arr['level'],
+					'jname'=>$arr['jname'],
+					'pid'=>$arr['pid'],
 				);
-				$this->db->where('jid',$arr['id']);
+				$this->db->where('jid',$arr['jid']);
 				$query=$this->db->update('job',$row);
 				if (!$query){
 					$return['code']=550;
@@ -223,17 +217,17 @@ class Base extends CI_Model {
 					$return['message']='职务信息没有被修改';
 				}
 				return $return;
-			case 'del':  //删除职务信息
+			case 'drop':  //删除职务信息
 				//检查当前部门是否已经有用户存在
 				$this->db->select('uid');
-				$this->db->where('jid',$arr['id']);
+				$this->db->where('jid',$arr['jid']);
 				$this->db->from('user');
 				if ($this->db->count_all_results()>0){
 					$return['code']=500;
 					$return['message']='该职务下已经存在用户信息，请确保要操作的职务无对应用户信息后再删除';
 					return $return;
 				};
-				$this->db->where('jid',$arr['id']);
+				$this->db->where('jid',$arr['jid']);
 				$query=$this->db->delete('job');
 				if (!$query){
 					$return['code']=550;
