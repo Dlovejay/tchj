@@ -128,6 +128,9 @@ article,aside,dialog,footer,header,section,footer,nav,figure,menu{ display:block
 /* 下拉框 */
 .rexSelect{ background-color:#fff; height:2.32em; padding-top:.4em; padding-bottom:.4em;}
 .rexSelect:focus{ border:1px solid #2966d6; outline:none; box-shadow:0 0 2px #9dbdff inset;}
+.rexSelect.warning{ background-color:#fff3dc; border-color:#f90;}
+.rexSelect.warning:focus{ border-color:#f90; box-shadow:0 0 2px #f90 inset;}
+.rexSelect[disabled]{ background-color:#eee; color:#aaa; border-color:#aaa;}
 /* 下拉框加强版 */
 .rexComboBox{ padding:0; border:0; background-color:transparent; overflow:visible;}
 .rexComboBox:before{ cursor:pointer; height:100%; padding:0 .4em; position:absolute; right:0; top:50%; transform:translateY(-50%); z-index:1; background-color:#eee; border:1px solid transparent; border-left:1px solid #999; background-clip:padding-box; border-radius:0 6px 6px 0; line-height:2.1; overflow:hidden;}
@@ -332,7 +335,7 @@ body{ font-size:14px;}
 .formpart>.rexLabel{ display:inline-block; vertical-align:middle; padding-right:10px; color:#777; width:110px; text-align:right;}
 .formpart>span{ display:inline-block; vertical-align:middle; padding-right:20px; width:calc(100% - 110px); text-align:left;}
 .formpart>.request:after{ content:'*'; font-size:1.4em; color:red; position:absolute; top:50%; margin-top:-9px; padding-left:3px;}
-.formpart>span input[type='text'],.formpart>span input[type='date'],.formpart>span textarea{ width:100%;}
+.formpart>span input[type='text'],.formpart>span input[type='password'],.formpart>span input[type='date'],.formpart>span textarea{ width:100%;}
 .formpart>span .rexTurn{ margin:3px;}
 
 /* 分页 */

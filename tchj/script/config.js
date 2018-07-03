@@ -14,9 +14,12 @@ var URL={  //本站URL地址
 	loginin:'/index.php/login/loginin/',
 	loginout:'/index.php/loginout/',
 	home:'/index.php/home/',
+	user:'/index.php/general/user', //HTTP用户列表页
+	useradd:'/index.php/general/useradd', //AJAX用户添加
+	useredit:'/index.php/general/useredit',  //AJAX用户资料修改
+	userdrop:'/index.php/general/userdrop',  //AJAX用户删除
 	department:'/rextest/department',
 	job:'/rextest/job',
-	user:'/rextest/user',
 	overview:'/rextest/overview',
 	mission:'/rextest/mission',
 	missionlist:'/rextest/missionlist',

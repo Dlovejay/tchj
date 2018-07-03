@@ -24,4 +24,15 @@
 .rexLeftpart .splitBar{ margin-top:20px;}
 .rexLeftpart a:first-child.splitBar{ margin-top:5px;}
 
-.rexRightpart{ padding:10px; background:#eee;}
+.rexRightpart{ padding:5px; background:#eee;}
+.dialog-content{ background-color:#eee;}
+.dataFill{ background-color:#fff; border-bottom:1px solid #ccc; padding-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,.1);}
+.buttonBar{ padding:10px;}
+.lay2col{ max-width:600;}
+.lay2col>*{ min-width:290px;}
+.buttonBar .tipMessage{ padding-top:0;}
+.tipMessage .fa{ padding:6px 20px; background-color:#fff; border:1px solid #ccc;}
+.tipMessage .warning{ border-color:#f90;}
+.tipMessage .alert{ border-color:red;}
+.tipMessage .ok{ border-color:green;}
+.tipMessage .loading{ border-color:#697ac1;}

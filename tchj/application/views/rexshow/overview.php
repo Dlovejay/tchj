@@ -39,6 +39,12 @@ h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; backgr
 			<h2 class="bkStyle1"><span class="fa fa-bar-chart-o"></span> 工作概览</h2>
 		</div>
 		<div class="rexRightpart">
+			<ul class="rexTab tCT">
+				<li class="rexItem sel">总计</li>
+				<li class="rexItem">司令部</li>
+				<li class="rexItem">政治处</li>
+				<li class="rexItem">后勤处</li>
+			</ul>
 			<div class="overview">
 				<h3><span class="fa fa-calendar"></span>任务统计</h3>
 				<div class="inside">
