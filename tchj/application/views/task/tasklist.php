@@ -240,7 +240,7 @@
 									</tr>
 								</table>
 							</li>
-							<li class="alone formpart table returnList" v-if="viewobj.mid">
+							<li class="alone formpart table returnList" v-if="viewobj.mid && returnList[viewobj.mid]">
 								<div class="captionTitle">
 									<span class="fa fa-comments-o"> 回复列表</span>
 									<button class="rexButton fa fa-refresh ss infor" title="刷新回复列表" v-bind:disabled="load.re" @click="getAJAXDetail()"></button>
@@ -265,20 +265,67 @@
 			</div>
 		</div>
 		
-		<!-- 提示信息 -->
-		<div id="sure" class="extDialog">
+		<!-- 确认操作提示信息 -->
+		<div id="sure" class="extDialog" noclick="noclick">
 			<div class="dialogFrame">
 				<div class="dialog-title warning">
 					<h4 class="t3"><span class="fa fa-exclamation-circle"></span>&emsp;<span class="diy">系统信息提示</span></h4>
 				</div>
 				<div class="dialog-buttonBar">
 					<div class="bntInside">
-						<button class="rexButton opBnt" @click="hideDialog('sure')"> 取 消</button>
-						<button class="rexButton opBnt infor" @click="getAJAXNext()"> 确 定</button>
+						<button class="rexButton" @click="hideDialog('sure')" v-bind:disabled="load.re"> 取 消</button>
+						<button class="rexButton infor" @click="getAJAXNext()" v-bind:disabled="load.re"> 确 定</button>
 					</div>
 				</div>
 				<div class="dialog-content">
 					<div class="diy sP1"></div>
+					<div class="tipMessage" v-if="chk[4].flag">
+						<span class="fa" v-bind:class="chk[4].flag"> {{chk[4].msg}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 回复弹框 -->
+		<div id="answer" class="extDialog">
+			<div class="dialogFrame">
+				<div class="dialog-title">
+					<span class="opBnt right fa fa-lg fa-times" @click="hideDialog('answer')"></span>
+					<h4 class="t3"><span class="fa fa-comment-o"></span>&emsp;<span class="diy">任务进度回复</span></h4>
+				</div>
+				<div class="dialog-buttonBar">
+					<div class="bntInside">
+						<button class="rexButton opBnt infor" @click="sendData()"> 提交回复</button>
+					</div>
+				</div>
+				<div class="dialog-content">
+					<ul class="lay2col style1 sP1">
+						<li class="formpart alone" v-if="canDo && canFinish">
+							<label class="rexLabel">任务评审</label><span>
+								<span class="rexCheck">
+									<input type="radio" name="returntype" value="FINISHED" checked="checked"/>
+									<label>任务完成</label>
+								</span>
+								<span class="rexCheck">
+									<input type="radio" name="returntype" value="0"/>
+									<label>审核不通过，退回</label>
+								</span>
+							</span>
+						</li>
+						<li class="formpart alone">
+							<label class="rexLabel">回复内容</label><span class="request">
+								<textarea class="rexTxtarea"></textarea>
+							</span>
+						</li>
+						<li class="formpart alone" v-if="canDo && canTimeout">
+							<label class="rexLabel">超时说明</label><span class="request">
+								<textarea class="rexTxtarea"></textarea>
+							</span>
+						</li>
+					</ul>
+					<div class="tipMessage" v-if="chk[4].flag">
+						<span class="fa" v-bind:class="chk[4].flag"> {{chk[4].msg}}</span>
+					</div>
 				</div>
 			</div>
 		</div>

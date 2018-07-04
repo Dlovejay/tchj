@@ -20,83 +20,106 @@ class ConsultList extends CI_Model
     public function query_total($where=array())
     {
         if (empty($where)) {
-            return $this->db->count_all('consultlist');
+            return $this->db->count_all('consultlist c');
         }else{
-            return $this->db->where($where)->count_all_results('consultlist');
+            return $this->db->where($where)->count_all_results('consultlist c');
         }
     }
 
-
-    # 请示相关统计  给首页用
-    # return
-    /*
-     Array
-(
-    [total] => 8        # 总的请示数
-    [department_data] => Array
-        (
-            [1] => Array
-                (
-                    [pid] => 1      # 部门
-                    [pname] => 太仓海警支队   # 部门名称
-                    [ongoing_cnt] => 3      # 正在进行的请示数
-                    [revoke_cnt] => 1       # 撤销的请示数
-                    [complete_cnt] => 1     # 完成的请示数
-                    [total] => 4            # 总的请示数(不含撤销的)
-                )
-        )
-
-    )
-    */
-    public function consult_statistics()
+    public function consult_statistics($pid)
     {
-        # 总数
-        $total = $this->query_total('status != 3');
+        # 先看一下当前用户所在部门级别
+        $user_department = $this->db->where('pid', $pid)->get('department')->result_array();
+        # $plevel 表示部门级别  0可以看到所有部门的  1只能看到本部门收到的请示数  2只能看到本部门发送的请示数
+        $plevel = $user_department[0]['plevel'];
 
-        # 分部门来查询进行中的(status = 1 or status = 0)
-        $ongoing_data = $this->query_department_count('c.status IN (0, 1)');
+        $return = array();
+        switch ($plevel) {
+            case 0:
+                $where = 'plevel = 1';
+                $return = $this->boss_statistics($where);
+                break;
 
-        # 撤销的数量
-        $revoke_data = $this->query_department_count('c.status = 3');
+            case 1:
+                $where = "pid = {$user_department[0]['pid']}";
+                $return = $this->boss_statistics($where);
+                break;
 
-        # 完成的数量
-        $complete_data = $this->query_department_count('c.status = 2');
+            default:
+                $where = "pid = {$user_department[0]['pid']}";
+                $return = $this->boss_statistics($where, 1);
+        }
+        $return['pid'] = $user_department[0]['pid'];
+        $return['pname'] = $user_department[0]['pname'];
+        return $return;
+    }
 
-        $department_data = array();
-        foreach ($ongoing_data as $val) {
-            $department_data[$val['pid']] = array(
-                'pid' => $val['pid'],
-                'pname' => $val['pname'],
-                'ongoing_cnt' => $val['cnt'],
-                'revoke_cnt' => 0,
-                'complete_cnt' => 0,
-                'total' => 0
-            );
-            foreach ($revoke_data as $rv) {
-                $department_data[$rv['pid']]['revoke_cnt'] = $rv['cnt'];
-            }
-            foreach ($complete_data as $cv) {
-                $department_data[$cv['pid']]['complete_cnt'] = $cv['cnt'];
-            }
-            $department_data[$val['pid']]['total'] = $department_data[$val['pid']]['ongoing_cnt'] + $department_data[$val['pid']]['complete_cnt'];
+    public function boss_statistics ($where, $user_type=0)
+    {
+        # 查询出plevel = 1的部门
+        $departments = $this->db->where($where)->get('department')->result_array();
+
+        $return = array(
+            'total' => 0,
+            'total_ongoing' => 0,
+            'total_complete' => 0,
+            'total_revoke' => 0,
+            'departments' => array()
+        );
+        foreach ($departments as $department) {
+            $data = $this->_consult_statistics($department['pid'], $user_type);
+            $data['pname'] = $department['pname'];
+            $data['pid'] = $department['pid'];
+            $return['total'] += $data['total_cnt'];
+            $return['total_ongoing'] += $data['ongoing_cnt'];
+            $return['total_complete'] += $data['complete_cnt'];
+            $return['total_revoke'] += $data['revoke_cnt'];
+            array_push($return['departments'], $data);
         }
 
-        $result = array(
-            'total' => $total,
-            'department_data' => $department_data
+        return $return;
+    }
+
+    # 各部门的统计
+    public function _consult_statistics($pid, $user_type=0)
+    {
+        # user_type 代表是不是上级 0上级 1下级
+        if ($user_type == 0) {
+            $where = " pid = {$pid}";
+        }else{
+            $where = " created_pid = {$pid}";
+        }
+        $field = 'pid, status';
+        $query = $this->db->from('consultlist')->select($field)->where($where);
+        $rows = $query->get()->result_array();
+        $ongoing_cnt = 0;
+        $complete_cnt = 0;
+        $revoke_cnt = 0;
+
+        foreach ($rows as $row) {
+            switch($row['status']){
+                case 0:
+                case 1:
+                    $ongoing_cnt += 1;
+                    break;
+                case 2:
+                    $complete_cnt += 1;
+                    break;
+                case 3:
+                    $revoke_cnt += 1;
+                    break;
+            }
+        }
+        $total_cnt = $ongoing_cnt + $complete_cnt;
+
+        $return = array(
+            'total_cnt' => $total_cnt,
+            'ongoing_cnt' => $ongoing_cnt,
+            'complete_cnt' => $complete_cnt,
+            'revoke_cnt' => $revoke_cnt
         );
 
-        return $result;
-    }
-
-    public function query_department_count($where='')
-    {
-        $field = 'c.pid, count(c.id) cnt, d.pname';
-        $this->db->from('consultlist c')->join('department d', 'c.pid = d.pid')->select($field)->where($where);
-
-        $result = $this->db->group_by('c.pid')->get()->result_array();
-
-        return $result;
+        return $return;
     }
 }
 

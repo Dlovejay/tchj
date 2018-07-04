@@ -49,7 +49,7 @@ var vu=new Vue({
 			url:'',
 			name:''
 		},
-		chk:'',  //提示信息 [0]列表 [1]添加，编辑 [2]附件操作 [3]回复操作
+		chk:'',  //提示信息 [0]列表 [1]添加，编辑 [2]附件操作 [3]回复列表获取 [4]回复发送
 		load:{
 			list:false,  //显示列表加载中标记
 			op:false,    //操作任务信息加载中标记
@@ -83,13 +83,14 @@ var vu=new Vue({
 			}
 			return tempArray;
 		},
-		canDo: function(){
+		canDo: function(){  //回复/修改操作是否可进行的基本判定
 			if (this.load.re) return false;
 			if (!this.viewobj) return false;
 			if (!this.returnList[this.viewobj.mid]) return false;
 			return true;
 		},
 		canRepeal: function(){  //是否可以撤销
+			//"DELETE","EDIT","RECEIVE","REPLY","FINISHED","BACK","REPEAL"
 			if (this.returnList[this.viewobj.mid].status.indexOf('REPEAL')>=0) return true;
 			return false;
 		},
@@ -99,6 +100,7 @@ var vu=new Vue({
 		},
 		canReply: function(){    //是否可以回复
 			if (this.returnList[this.viewobj.mid].status.indexOf('REPLY')>=0) return true;
+			if (this.returnList[this.viewobj.mid].status.indexOf('FINISHED')>=0) return true;
 			return false;
 		},
 		canReceive: function(){  //是否可以接受任务
@@ -106,9 +108,14 @@ var vu=new Vue({
 			return false;
 		},
 		canEdit: function(){  //是否可以修改
-			//"DELETE","EDIT","RECEIVE","REPLY","FINISHED","BACK","REPEAL"
-			if (this.returnList[this.viewobj.mid].status.indexOf('EDIT')>=0) return true;
+			return (this.returnList[this.viewobj.mid].can_edit);
+		},
+		canFinish: function(){ //是否可以完成
+			if (this.returnList[this.viewobj.mid].status.indexOf('FINISHED')>=0) return true;
 			return false;
+		},
+		canTimeout: function(){  //是否要填写超时说明
+			return this.returnList[this.viewobj.mid].timeout;
 		}
 	},
 	methods:{
@@ -247,6 +254,13 @@ var vu=new Vue({
 					dialog.open('sure',content);
 					return;
 					break;
+				case 'answer':
+					var nowstatus=this.returnList[this.viewobj.mid].status;
+					if (nowstatus.indexOf('REPLY')>=0){
+						this.ajaxtype='REPLY';
+					}else{
+						this.ajaxtype='FINISHED';
+					}
 			}
 			dialog.open(txt);
 		},
@@ -273,6 +287,7 @@ var vu=new Vue({
 					break;
 				case 'sure':
 					this.ajaxtype='';
+					this.clearChk(4);
 					break;
 					
 			}
@@ -292,6 +307,12 @@ var vu=new Vue({
 					this.load.re=true;
 					this.setChk(3,'loading','正在获取该任务回复列表，请稍等...');
 					break;
+				default:
+					var tempArray=['RECEIVE','DELETE','REPEAL'];
+					if (tempArray.indexOf(this.ajaxtype)>=0){
+						this.load.re=true;
+						this.setChk(4,'loading','正在重置任务状态，请稍等...');
+					}
 			}
 		},
 		AJAXerror: function(code,msg){
@@ -307,6 +328,13 @@ var vu=new Vue({
 				case 'detail':
 					this.load.re=false;
 					this.setChk(3,'alert',code+' '+msg);
+					break;
+				default:
+					var tempArray=['RECEIVE','DELETE','REPEAL'];
+					if (tempArray.indexOf(this.ajaxtype)>=0){
+						this.load.re=false;
+						this.setChk(4,'alert',code+' '+msg);
+					}
 					break;
 			}
 		},
@@ -333,7 +361,19 @@ var vu=new Vue({
 						this.load.re=false;
 						this.setChk(3,'alert',data.message);
 					}else{
-						this.setAjaxDetail(data.data);
+						this.setAJAXDetail(data.data);
+					}
+					break;
+				default:
+					var tempArray=['RECEIVE','DELETE','REPEAL'];
+					if (tempArray.indexOf(this.ajaxtype)>=0){
+						if (data.code){
+							this.load.re=false;
+							this.setChk(4,'alert',data.message);
+							return;  //不能执行清空ajaxtype，否则继续提交会有问题
+						}else{
+							this.setAJAXNext(data.data);
+						}
 					}
 			}
 			this.ajaxtype='';
@@ -507,7 +547,7 @@ var vu=new Vue({
 			},2000);
 		},
 		getAJAXDetail: function(){ //获取任务反馈信息
-			this.returnList[this.viewobj.mid]={};
+			delete this.returnList[this.viewobj.mid];
 			this.ajaxtype='detail';
 			ajax.data={
 				id:this.viewobj.mid
@@ -515,7 +555,7 @@ var vu=new Vue({
 			ajax.url=URL.taskdetail;
 			ajax.send();
 		},
-		setAjaxDetail: function(data){
+		setAJAXDetail: function(data){
 			this.load.re=false;
 			this.clearChk(3);
 			var temp={
@@ -524,22 +564,25 @@ var vu=new Vue({
 				timeout:data.is_timeout
 			};
 			for (var i=0; i<temp.list.length; i++){  //协调显示状态
-				var fituser=vu.user[temp.list[i]['create_user_id']];
+				var fituser=this.user[temp.list[i]['create_user_id']];
 				if (fituser){
+					temp.list[i].create_user_name=fituser.username;
 					if (fituser.uid==this.viewobj.authorid){
 						temp.list[i].classstr='anmanager';
 					}else{
 						temp.list[i].classstr='anuser';
 					}
 				}else{
+					temp.list[i].create_user_name='unknow';
 					temp.list[i].classstr='anuser';
 				}
+				temp.list[i].update_at=getStringTime(temp.list[i].update_at,'','-');
 			}
 			if (temp.list.length==0) this.setChk(3,'warning','暂无任何回复信息');
-			Vue.set(vu.returnList,vu.viewobj.mid,temp);
+			Vue.set(this.returnList,this.viewobj.mid,temp);
+			console.log(this.returnList);
 		},
 		getAJAXNext: function(){
-			dialog.close('sure');
 			var content='';
 			switch(this.ajaxtype){
 				case 'RECEIVE':
@@ -559,10 +602,20 @@ var vu=new Vue({
 			};
 			ajax.url=URL.tasknext;
 			ajax.send();
+		},
+		setAJAXNext: function(data){
+			//刷新回复页面
+			this.setChk(4,'ok','设置任务状态成功');
+			this.ajaxtype='';
+			setTimeout(function(){
+				vu.hideDialog('sure');
+				//刷新回复列表
+				vu.getAJAXDetail();
+			},1200);
 		}
 	},
 	created:function(){
-		this.chk=this._getChkobj(4); //准备提示信息对象
+		this.chk=this._getChkobj(5); //准备提示信息对象
 		//判定当前用户权限
 		if (this.me.tid==CFG.UL){
 			this.isPublic=true;

@@ -12,8 +12,8 @@
 .nowStatus.st4:before{ content:'已完成'; color:#fff;}
 .nowStatus.st5{ background-color:#e44e4e; border-color:#c00505;}
 .nowStatus.st5:before{ content:'被退回'; color:#fff; font-weight:600;}
-.nowStatus.st6{ background-color:#b4b4b4; border:1px dashed #5a5a5a;}
-.nowStatus.st6:before{ content:'已撤销'; color:#333;}
+.nowStatus.st7{ background-color:#b4b4b4; border:1px dashed #5a5a5a;}
+.nowStatus.st7:before{ content:'已撤销'; color:#333;}
 .timeoutStatus{ background-color:red; color:#fff; padding:3px 5px; border-radius:6px; font-weight:normal; border:1px solid red;}
 
 #viewOP .dialog-content,#taskop .dialog-content{ background-color:#eee;}
