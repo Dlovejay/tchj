@@ -190,7 +190,6 @@ UNLOCK TABLES;
 CREATE TABLE `task` (
   `mid` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL DEFAULT '' COMMENT '标题',
-  `mtitle` varchar(20) NOT NULL DEFAULT '' COMMENT '副标题',
   `content` text NOT NULL COMMENT '内容',
   `start_at` int(11) NOT NULL DEFAULT 0 COMMENT '开始时间',
   `end_at` int(11) NOT NULL DEFAULT 0 COMMENT '结束时间',
@@ -203,20 +202,13 @@ CREATE TABLE `task` (
   `replys` text NOT NULL COMMENT '回复',
   `annex` text NOT NULL COMMENT '附件',
   `is_timeout` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否过期（0:未过期，1过期）',
-  `departments` varchar(20) NOT NULL DEFAULT '' COMMENT '部门',
+  `departments` varchar(30) NOT NULL DEFAULT '' COMMENT '部门',
+  `cause` varchar(100) NOT NULL DEFAULT '' COMMENT '未通过的原因',
+  `initiate_pid` int(11) NOT NULL DEFAULT 0 COMMENT '发起的部门id',
+  `pid` int(11) NOT NULL COMMENT '部门id',
   PRIMARY KEY (`mid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
-LOCK TABLES `task` WRITE;
-/*!40000 ALTER TABLE `task` DISABLE KEYS */;
-
-INSERT INTO `task` (`mid`, `title`, `mtitle`, `content`, `start_at`, `end_at`, `create_at`, `update_at`, `create_user_id`, `last_do_user_id`, `count`, `status`, `replys`, `annex`, `is_timeout`, `departments`)
-VALUES
-	(1,'测试234','','测试',1433100599,2147483647,1530379943,1530427465,3,2,1,1,'[{\"reply_id\":1,\"create_user_id\":\"2\",\"content\":\"\\u6d4b\\u8bd5\",\"update_at\":1530427465,\"status\":\"2\"}]','[]',0,'5,6,7'),
-	(2,'测试1234567','','测试22',1433100599,1433100599,1530381930,1530427749,5,2,2,1,'[{\"reply_id\":1,\"create_user_id\":\"2\",\"content\":\"\\u6d4b\\u8bd5\",\"update_at\":1530427716,\"status\":\"2\"},{\"reply_id\":2,\"create_user_id\":\"2\",\"content\":\"\\u6d4b\\u8bd5\",\"update_at\":1530427749,\"status\":\"3\"}]','[]',0,'3,5,6');
-
-/*!40000 ALTER TABLE `task` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table task_department_relation
@@ -229,20 +221,6 @@ CREATE TABLE `task_department_relation` (
   KEY `department_id` (`pid`,`mid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-LOCK TABLES `task_department_relation` WRITE;
-/*!40000 ALTER TABLE `task_department_relation` DISABLE KEYS */;
-
-INSERT INTO `task_department_relation` (`mid`, `pid`)
-VALUES
-	(1,5),
-	(1,6),
-	(1,7),
-	(2,3),
-	(2,5),
-	(2,6);
-
-/*!40000 ALTER TABLE `task_department_relation` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table user
