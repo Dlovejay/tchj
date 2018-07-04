@@ -236,7 +236,7 @@
 										</td>
 									</tr>
 									<tr class="alone" v-if="viewobj && viewobj.annexobj.length==0">
-										<td colspan="3" class="tipMessage warning tCT"><span class="fa fa-lg fa-warning"></span> 暂无任何列表信息</td>
+										<td colspan="3" class="tipMessage tCT"><span class="fa warning"> 暂无任何附件信息</span></td>
 									</tr>
 								</table>
 							</li>

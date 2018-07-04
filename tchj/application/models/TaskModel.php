@@ -118,7 +118,7 @@ class TaskModel extends CI_Model
 
 
     public function getPageResult($user, $params) {
-        $field = array('t.mid', 't.title', 't.content', 't.start_at', 't.end_at', 't.create_at', 't.update_at', 't.create_user_id', 't.last_do_user_id', 't.count', 't.status', 't.annex', 't.is_timeout', 't.departments');
+        $field = array('t.mid', 't.title', 't.content', 't.start_at', 't.end_at', 't.create_at', 't.update_at', 't.create_user_id', 't.last_do_user_id', 't.count', 't.status', 't.annex', 't.is_timeout', 't.departments','t.initiate_pid');
         $mysqlParams = $this->getJoinWhere($user, $params);
         $countSql = " SELECT COUNT(*) AS total FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"];
         $sql = " SELECT " . implode(",", $field) . " FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"] . " ORDER BY t.update_at DESC ";

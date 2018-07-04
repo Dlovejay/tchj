@@ -143,7 +143,7 @@ var vu=new Vue({
 				dateStr+='~'+formatDateTime(d2,'date','c');
 			}
 			
-			var pubDepartment=this.department[obj.mtitle].pname;
+			var pubDepartment=this.department[obj.initiate_pid].pname;
 			var tempAuthor=this.user[obj['create_user_id']]['username'];
 			var tempArray2=obj['departments'].split(',');
 			var temppass=[];
@@ -166,7 +166,7 @@ var vu=new Vue({
 					mid: obj.mid,
 					title: obj.title,
 					pub: pubDepartment,
-					mtitle: obj.mtitle,
+					mtitle: obj.initiate_pid,
 					start_at: d1,
 					end_at: d2,
 					date: dateStr,
@@ -437,6 +437,8 @@ var vu=new Vue({
 					return;
 				}
 			}
+			//删除当前数据
+			
 			if (pagenum===undefined){
 				this.pager.total=0;
 				this.pager.page=1;
@@ -460,10 +462,11 @@ var vu=new Vue({
 			this.pager.total=data.pager.total;
 			this.pager.pagecount=Math.ceil(this.pager.total/this.pager.pagesize);
 			
+			this.list=[];
 			if (data.pager.total!=='0'){
-				this.list=[];
 				this.reflist={};
 				for (var i=0; i<data.list.length; i++){
+					console.log(data.list[i]);
 					this.list.push(this._processList(data.list[i]));
 					this.reflist[data.list[i].mid]=i;
 				}
@@ -523,7 +526,7 @@ var vu=new Vue({
 			this.ajaxtype='add';
 			ajax.data={
 				title:this.edit.title,
-				mtitle:this.edit.mtitle,
+				initiate_pid:this.edit.mtitle,
 				start_at:getUnixTime(this.edit.start_at)/1000,
 				end_at:getUnixTime(this.edit.end_at)/1000,
 				content:this.edit.content,
@@ -536,15 +539,19 @@ var vu=new Vue({
 		setTaskSend: function(data){   //添加成功返回处理
 			if (this.op=='add'){
 				this.setChk(1,'ok','新任务已经添加成功');
-				this.getAJAXList();
+				setTimeout(function(){
+					vu.getAJAXList();
+					vu.load.op=false;
+					vu.hideDialog('taskop');
+				},1500);
 			}else{
 				this.setChk(1,'ok','任务已修改成功');
-				this.getAJAXList(this.pager.page);
+				setTimeout(function(){
+					vu.getAJAXList(vu.pager.page);
+					vu.load.op=false;
+					vu.hideDialog('taskop');
+				},1500);
 			}
-			setTimeout(function(){
-				vu.load.op=false;
-				vu.hideDialog('taskop');
-			},2000);
 		},
 		getAJAXDetail: function(){ //获取任务反馈信息
 			delete this.returnList[this.viewobj.mid];
@@ -606,6 +613,8 @@ var vu=new Vue({
 		setAJAXNext: function(data){
 			//刷新回复页面
 			this.setChk(4,'ok','设置任务状态成功');
+			switch(this.ajaxtype){
+			}
 			this.ajaxtype='';
 			setTimeout(function(){
 				vu.hideDialog('sure');
