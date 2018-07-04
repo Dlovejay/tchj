@@ -5,6 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 //生成应对ajax的返回对象并输出
 //ajax返回的错误标志 401客户端数据问题 403权限问题 440未登录 500服务端错误...
 function rexAjaxReturn($code=0,$message='',$data=''){
+    header("Content-type:text/json");
 	$return=array('code'=>0,'message'=>'','data'=>'');
 	if (is_array($code)){
 		$return=$code;

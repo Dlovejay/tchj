@@ -82,10 +82,10 @@ class TaskModel extends CI_Model
         if ($user["tid"] == USERM) {
 
         } else if ($user["tid"] == USERL) {
-            $where = " !(t.status = 1 AND t.start_at>{$time} AND t.create_user_id != {$user['uid']}) ";
+            $where = " !(t.status = 1 AND t.start_at>{$time} AND t.pid != {$user['pid']}) ";
         } else {
-            $join = " task AS t LEFT JOIN task_department_relation  AS r ON t.mid=r.mid AND t.create_user_id != {$user['uid']} ";
-            $where = " !(t.status = 1 AND t.start_at>{$time} AND t.create_user_id != {$user['uid']}) AND (t.create_user_id = {$user['uid']} OR r.pid={$user['pid']} OR r.pid=0 )";
+            $join = " task AS t LEFT JOIN task_department_relation  AS r ON t.mid=r.mid AND t.pid != {$user['pid']} ";
+            $where = " !(t.status = 1 AND t.start_at>{$time} AND t.pid != {$user['pid']}) AND (t.pid = {$user['pid']} OR r.pid={$user['pid']} OR r.pid=0 )";
         }
 
         if (isset($params["status"]) && $params["status"] !=="" && in_array($params["status"], array(0,1,2,3,4,5,6,7))) {
@@ -118,7 +118,7 @@ class TaskModel extends CI_Model
 
 
     public function getPageResult($user, $params) {
-        $field = array('t.mid', 't.title', 't.mtitle', 't.content', 't.start_at', 't.end_at', 't.create_at', 't.update_at', 't.create_user_id', 't.last_do_user_id', 't.count', 't.status', 't.annex', 't.is_timeout', 't.departments');
+        $field = array('t.mid', 't.title', 't.content', 't.start_at', 't.end_at', 't.create_at', 't.update_at', 't.create_user_id', 't.last_do_user_id', 't.count', 't.status', 't.annex', 't.is_timeout', 't.departments');
         $mysqlParams = $this->getJoinWhere($user, $params);
         $countSql = " SELECT COUNT(*) AS total FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"];
         $sql = " SELECT " . implode(",", $field) . " FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"] . " ORDER BY t.update_at DESC ";
@@ -212,31 +212,31 @@ class TaskModel extends CI_Model
         if ($user["tid"] == 1) {
             return array("success" => true, "do" => array());
         } elseif($user["tid"] == 2) {
-            if ($task['status'] == 0 && $task["create_user_id"] != $user["uid"]) {
+            if ($task['status'] == 0 && $task["pid"] != $user["pid"]) {
                 return array("success" => false, "do" => array());
             }
 
             $dos = array();
             foreach(self::$config[$task["status"]] as $k=>$do) {
-                if($do["permissionType"] == 1 && $task["create_user_id"] == $user["uid"]) {
+                if($do["permissionType"] == 1 && $task["pid"] == $user["pid"]) {
                    $dos[] = $k;
                 }
             }
         } else {
             $departments = explode(",", $task["departments"]);
 
-            if ($task['status'] == 0 && $task["create_user_id"] != $user["uid"]) {
+            if ($task['status'] == 0 && $task["pid"] != $user["pid"]) {
                 return array("success" => false, "do" => array());
             }
 
-            if ($departments[0] != 0 && $task["create_user_id"] != $user["uid"] && !in_array($user["pid"], $departments)) {
+            if ($departments[0] != 0 && $task["pid"] != $user["pid"] && !in_array($user["pid"], $departments)) {
                 return array("success" => false, "do" => array());
             }
 
 
             $dos = array();
             foreach(self::$config[$task["status"]] as $k=>$do) {
-                if($do["permissionType"] == 1 && $task["create_user_id"] == $user["uid"]) {
+                if($do["permissionType"] == 1 && $task["pid"] == $user["pid"]) {
                     $dos[] = $k;
                 } elseif($do["permissionType"] == 2 && ($departments[0] == 0 || in_array($user["pid"], $departments))) {
                     $dos[] = $k;
@@ -256,6 +256,15 @@ class TaskModel extends CI_Model
     public function isTimeout($task) {
         $time = time();
         if ($task["is_timeout"] == 1 || (in_array($task["status"], array(1,2)) && $task["end_at"] < $time)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public function canEdit($task, $user) {
+        if ($task['pid'] == $user['pid'] && in_array($task['status'], array(1,2))) {
             return true;
         } else {
             return false;
@@ -285,10 +294,6 @@ class TaskModel extends CI_Model
             "status" => $nextStatus,
         );
 
-        if (isset($params["cause"])) {
-            $replay["cause"] = $params["cause"];
-        }
-
         $replys[] = $reply;
 
         $fields = array (
@@ -299,6 +304,11 @@ class TaskModel extends CI_Model
             "is_timeout" => $isTimeout,
             "replys" => json_encode($replys),
         );
+
+        if (isset($params["cause"])) {
+            $fields["cause"] = $params["cause"];
+        }
+
 
         $sql = $this->db->set($fields)->where("mid", $params["id"])->get_compiled_update("task");
         $this->db->query($sql);

@@ -15,13 +15,20 @@ class Task extends MY_Controller{
 
     // 默认页面
     public function index() {
-        $user = $this->session->userdata('user_info');
-        var_dump($user);
+        $this->load->model('User');
+        $result=$this->User->user();
+        $data['user']=$result['data'];
+        $data['account']=$_SESSION['user'];
+        $this->load->model('Base');
+        $result=$this->Base->department();
+        $data['department']=$result['data'];
+        $this->load->view('task/tasklist.php',$data);
     }
 
 
-    public function list() {
-        $user = $this->session->userdata('user_info');
+    public function lists() {
+        //$user = $this->session->userdata('user_info');
+        $user = $_SESSION['user'];
         $params = array(
             'keywords' => $this->input->post('keywords'),
             'status' => $this->input->post('status'),
@@ -30,115 +37,115 @@ class Task extends MY_Controller{
             'pagesize' => $this->input->post('pagesize'),
         );
         $this->load->model('TaskModel');
-        $this->returnData(0, "", $this->TaskModel->getPageResult($user, $params));
+        rexAjaxReturn(0, "", $this->TaskModel->getPageResult($user, $params));
     }
 
 
     // 获取明细
     public function detail() {
-        $user = $this->session->userdata('user_info');
+        $user = $_SESSION['user'];
         $id = $this->input->post('id');
         if (empty($id)) {
-            $this->returnData(401, "任务id错误");
+            rexAjaxReturn(401, "任务id错误");
             return;
         }
 
         $this->load->model('TaskModel');
         $task = $this->TaskModel->getOneById($id);
         if(empty($task)) {
-            $this->returnData(401, "任务不存在");
+            rexAjaxReturn(401, "任务不存在");
             return;
         }
 
         $this->TaskModel->toUnstartStatus($task);
         $data = $this->TaskModel->getOperation($task, $user);
         if (!$data["success"]) {
-            $this->returnData("403", "无权限查看");
+            rexAjaxReturn("403", "无权限查看");
             return;
         }
         $dos = $data["do"];
         $timeout = $this->TaskModel->isTimeout($task);
-
-        $this->returnData(0, "",  array("replys" => json_decode($task["replys"], true), "is_timeout" => $timeout, "do" => $dos));
+        $canEdit = $this->TaskModel->canEdit($task, $user);
+        rexAjaxReturn(0, "",  array("replys" => json_decode($task["replys"], true), "is_timeout" => $timeout, "do" => $dos, 'canEdit' => $canEdit));
     }
 
 
 
     // 发起任务
     public function add() {
-        $user = $this->session->userdata('user_info');
-        $result = $this->_chkPower(array(USERL, USERU));
+        $user = $_SESSION['user'];
+        $result = $this->checkPower(array(USERL, USERU));
         if ($result["code"] != 0) {
-            $this->returnData($result["code"], $result["message"]);
+            rexAjaxReturn($result["code"], $result["message"]);
             return;
         }
 
         $result = $this->check($user, $this);
         if (!$result["success"]) {
-            $this->returnData(401, $result["errors"]);
+            rexAjaxReturn(401, $result["errors"]);
             return;
         }
 
         $fields = &$result["data"];
         $fields["create_user_id"] = $user["uid"];
+        $fields['pid'] = $user['pid'];
 
         $this->load->model('TaskModel');
         $id = $this->TaskModel->Add($fields);
         if ($id == 0) {
-            $this->returnData(500, "插入失败",  array("id" => $id));
+            rexAjaxReturn(500, "插入失败",  array("id" => $id));
         } else {
-            $this->returnData(0, "",  array("id" => $id));
+            rexAjaxReturn(0, "",  array("id" => $id));
         }
     }
 
     // 编辑任务
     public function edit() {
-        $user = $this->session->userdata('user_info');
-        //var_dump($user);exit;
+        $user = $_SESSION['user'];
         $id = $this->input->post('id');
         if (empty($id)) {
-            $this->returnData(401, "任务id错误");
+            rexAjaxReturn(401, "任务id错误");
             return;
         }
         $this->load->model('TaskModel');
         $task = $this->TaskModel->getOneById($id);
         if(empty($task)) {
-            $this->returnData(401, "任务不存在");
+            rexAjaxReturn(401, "任务不存在");
             return;
         }
 
         if($task["create_user_id"] != $user["uid"]) {
-            $this->returnData(403, "无权操作此任务");
+            rexAjaxReturn(403, "无权操作此任务");
             return;
         }
 
         if($task["status"] != 1) {
-            $this->returnData(401, "无法修改此任务");
+            rexAjaxReturn(401, "无法修改此任务");
             return;
         }
 
 
         $result = $this->check($user, $this);
         if (!$result["success"]) {
-            $this->returnData(401, $result["errors"]);
+            rexAjaxReturn(401, $result["errors"]);
             return;
         }
 
         $fields = &$result["data"];
         if ($this->TaskModel->edit($id, $fields)) {
-            $this->returnData();
+            rexAjaxReturn();
         } else {
-            $this->returnData(500, "更新失败",  array("id" => $id));
+            rexAjaxReturn(500, "更新失败",  array("id" => $id));
         }
     }
 
 
     public function next() {
-        $user = $this->session->userdata('user_info');
+        $user = $_SESSION['user'];
 
         $result = $this->checkNext();
         if (!$result["success"]) {
-            $this->returnData(401, $result["errors"]);
+            rexAjaxReturn(401, $result["errors"]);
             return;
         }
         $params = $result["data"];
@@ -146,25 +153,45 @@ class Task extends MY_Controller{
         $this->load->model('TaskModel');
         $task = $this->TaskModel->getOneById($params["id"]);
         if(empty($task)) {
-            $this->returnData(401, "任务不存在");
+            rexAjaxReturn(401, "任务不存在");
             return;
         }
 
         $this->TaskModel->toUnstartStatus($task);
         $isTimeout = $this->TaskModel->isTimeout($task);
-        if ($params["do"] == "REPLY" && $isTimeout && $task["status"] == 2 && $params["cause"] == "") {
-            $this->returnData(401, "请填过期原因");
-            return;
+        if ($params["do"] == "REPLY" && $isTimeout && $task["status"] == 2 ) {
+            if ($params["cause"] == "") {
+                rexAjaxReturn(401, "请填过期原因");
+                return;
+            }
         } else {
             unset($params["cause"]);
         }
 
         $result = $this->TaskModel->next($user, $params, $task, $isTimeout);
         if (!$result["success"]) {
-            $this->returnData(403, '无权限操作');
+            rexAjaxReturn(403, '无权限操作');
             return;
         }
-        $this->returnData();
+
+        //获取新的状态
+        $task = $this->TaskModel->getOneById($task['mid']);
+        if(empty($task)) {
+            rexAjaxReturn(401, "任务不存在");
+            return;
+        }
+
+        $this->TaskModel->toUnstartStatus($task);
+        $data = $this->TaskModel->getOperation($task, $user);
+        if (!$data["success"]) {
+            rexAjaxReturn("403", "无权限查看");
+            return;
+        }
+        $dos = $data["do"];
+        $timeout = $this->TaskModel->isTimeout($task);
+        $canEdit = $this->TaskModel->canEdit($task, $user);
+
+        rexAjaxReturn(0,"",array("is_timeout" => $timeout, "do" => $dos, 'canEdit' => $canEdit));
     }
 
 
@@ -220,7 +247,6 @@ class Task extends MY_Controller{
 
         $data = array(
             'title' => $this->input->post('title'),
-            //'mtitle' => $this->input->post('mtitle'), //先放一放
             'content' => $this->input->post('content'),
             'start_at' => $this->input->post('start_at'),
             'end_at' => $this->input->post('end_at'),
@@ -342,8 +368,8 @@ class Task extends MY_Controller{
                                 if (!in_array($value, $departmentIds)) {
                                     return false;
                                 }
-                                return true;
                             }
+                            return true;
                         }
                     )
                 ),
