@@ -14,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Task.php" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Task.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/application/controllers/Task.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="521">
-              <caret line="193" column="97" selection-start-line="193" selection-start-column="97" selection-end-line="193" selection-end-column="97" />
+            <state relative-caret-position="195">
+              <caret line="18" column="60" selection-start-line="18" selection-start-column="47" selection-end-line="18" selection-end-column="60" />
             </state>
           </provider>
         </entry>
@@ -31,17 +31,17 @@
       <file leaf-file-name="Department.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/application/models/Department.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="19" selection-start-line="19" selection-end-line="19" />
+            <state relative-caret-position="270">
+              <caret line="23" column="35" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="35" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TaskModel.php" pinned="false" current-in-tab="false">
+      <file leaf-file-name="TaskModel.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application/models/TaskModel.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3214">
-              <caret line="313" column="31" lean-forward="true" selection-start-line="313" selection-start-column="31" selection-end-line="313" selection-end-column="31" />
+            <state relative-caret-position="294">
+              <caret line="360" column="36" lean-forward="true" selection-start-line="360" selection-start-column="36" selection-end-line="360" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -85,8 +85,10 @@
       <find>getPageResult</find>
       <find>getOperation</find>
       <find>$this-&gt;returnData</find>
-      <find>exit</find>
       <find>next</find>
+      <find>department</find>
+      <find>GetStatistics</find>
+      <find>exit</find>
     </findStrings>
     <replaceStrings>
       <replace>rexAjaxReturn</replace>
@@ -104,8 +106,8 @@
         <option value="$PROJECT_DIR$/application/controllers/Login.php" />
         <option value="$PROJECT_DIR$/application/controllers/Tasktest.php" />
         <option value="$PROJECT_DIR$/application/helpers/pub_helper.php" />
-        <option value="$PROJECT_DIR$/application/models/TaskModel.php" />
         <option value="$PROJECT_DIR$/application/controllers/Task.php" />
+        <option value="$PROJECT_DIR$/application/models/TaskModel.php" />
       </list>
     </option>
   </component>
@@ -193,12 +195,12 @@
       <workItem from="1530281526529" duration="29987000" />
       <workItem from="1530438619731" duration="1425000" />
       <workItem from="1530624449028" duration="2108000" />
-      <workItem from="1530705827488" duration="5980000" />
+      <workItem from="1530705827488" duration="11369000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47344000" />
+    <option name="totallyTimeSpent" value="52733000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="817" extended-state="0" />
@@ -518,16 +520,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/application/models/Department.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/application/controllers/Rextest.php">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/application/controllers/Tasktest.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="49">
@@ -535,17 +527,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/application/models/TaskModel.php">
+    <entry file="file://$PROJECT_DIR$/application/models/Department.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3214">
-          <caret line="313" column="31" lean-forward="true" selection-start-line="313" selection-start-column="31" selection-end-line="313" selection-end-column="31" />
+        <state relative-caret-position="270">
+          <caret line="23" column="35" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="35" />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/application/controllers/Rextest.php">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/application/controllers/Task.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="521">
-          <caret line="193" column="97" selection-start-line="193" selection-start-column="97" selection-end-line="193" selection-end-column="97" />
+        <state relative-caret-position="195">
+          <caret line="18" column="60" selection-start-line="18" selection-start-column="47" selection-end-line="18" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/application/models/TaskModel.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="360" column="36" lean-forward="true" selection-start-line="360" selection-start-column="36" selection-end-line="360" selection-end-column="36" />
         </state>
       </provider>
     </entry>

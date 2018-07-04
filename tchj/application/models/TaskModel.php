@@ -313,7 +313,87 @@ class TaskModel extends CI_Model
         $sql = $this->db->set($fields)->where("mid", $params["id"])->get_compiled_update("task");
         $this->db->query($sql);
         return array("success" => true);
-
     }
+
+
+    public function GetStatistics($user) {
+        //array("join" => $join, "where" => $where, "params" => $param);
+        $field = array('t.mid', 't.start_at', 't.end_at', 't.count', 't.status', 't.is_timeout', 't.departments', 't.pid');
+        $mysqlParams = $this->getJoinWhere($user, array());
+        $sql = " SELECT " . implode(",", $field) . " FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"] . " AND t.`status` != 6 ";
+        $result = $this->db->query($sql, $mysqlParams["params"])->result_array();
+        foreach($result as &$v) {
+            $v['timeout'] = $this->isTimeout($v);
+            $v['departmentIds'] = explode(",", $v['departments']);
+        }
+
+        if ($user['tid'] == 1 || $user['tid'] == 2) {
+            $data = array('total' => array('pid' => 0, 'name' => '总计', 'count' => $this->count($result, 0)));
+            $CI =& get_instance();
+            $CI->load->model('Department');
+            $departments = $CI->Department->getListByLevels(array(1));
+            foreach ($departments as $d) {
+                $data[$d['pid']] = array('pid' => $d['pid'], 'name' => $d['pname'], 'count' => $this->count($result, $d['pid']));
+            }
+        } else {
+            $data = array($user['pid'] => array('pid' => $user['pid'], 'name' => '总计', 'count' => $this->count($result, $user['pid'])));
+        }
+        
+
+        return $data;
+    }
+
+    private function countInit() {
+        return array(
+            'total' => 0,
+            'doing' => 0,
+            'repeal' => 0,
+            'finish' => 0,
+            'first_finish' => 0,
+            'timeout' => 0,
+            'reply' => 0,
+        );
+    }
+
+    private function count($tasks, $pid) {
+        $count = $this->countInit();
+        foreach ($tasks as $task) {
+            if ($pid == 0 || $task['departments'] == '0' || $task['pid'] == $pid || in_array($pid, $task['departmentIds'])) {
+
+                $count['total'] = $count['total'] + 1;
+
+                if (in_array($task['status'], array(1, 2, 3, 5))) {
+                    $count['doing'] = $count['doing'] + 1;
+                }
+
+                if ($task['status'] == 7) {
+                    $count['repeal'] = $count['repeal'] + 1;
+                }
+
+                if ($task['status'] == 4) {
+                    $count['finish'] = $count['finish'] + 1;
+                    if ($task['count'] == 3) {
+                        $count['first_finish'] = $count['first_finish'] + 1;
+                    }
+                }
+
+                if ($task['timeout']) {
+                    $count['timeout'] = $count['timeout'] + 1;
+                }
+
+                if ($task['status'] == 3) {
+                    $count['reply'] = $count['reply'] + 1;
+                }
+            }
+        }
+        //var_dump($count);exit;
+        $count['first_finish_percent'] = $count['finish'] == 0?0:round($count['first_finish']/$count['finish']*100, 1);
+        $count['reply_percent'] = $count['doing'] == 0?0:round($count['reply']/$count['doing']*100, 1);
+        unset($count['first_finish']);
+        unset($count['reply']);
+        unset($count['finish']);
+        return $count;
+    }
+
 
 }

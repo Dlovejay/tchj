@@ -13,6 +13,12 @@ class Task extends MY_Controller{
     }
 
 
+    public function statistics() {
+        $user = $_SESSION['user'];
+        $this->load->model('TaskModel');
+        rexAjaxReturn(0, "", $this->TaskModel->GetStatistics($user));
+    }
+
     // 默认页面
     public function index() {
         $this->load->model('User');
