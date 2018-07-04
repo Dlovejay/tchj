@@ -28,18 +28,16 @@ var URL={  //本站URL地址
 	jobedit:'/index.php/general/jobedit', //AJAX职务修改
 	jobdrop:'/index.php/general/jobdrop', //AJAX职务删除
 	overview:'/rextest/overview',
-	task:'/index.php/tasktest/',   //HTTP任务列表页面
-	tasklist:'/index.php/tasktest/lists', //AJAX任务列表
-	taskadd:'/index.php/tasktest/add',    //AJAX任务添加
-	taskdetail:'/index.php/tasktest/detail', //AJAX获得任务回复列表
-	tasknext:'/index.php/tasktest/next',  //AJAX回复任务
-	missionlist:'/rextest/missionlist',
-	missionadd:'/rextest/missionadd',
-	returnlist:'/rextest/returnlist',
-	consult:'/rextest/consult',
-	consultlist:'/rextest/consultlist',
-	consultadd:'/rextest/consultadd',
-	consultreturn:'/rextest/consultreturn'
+	task:'/index.php/task/',   //HTTP任务列表页面
+	tasklist:'/index.php/task/lists', //AJAX任务列表
+	taskadd:'/index.php/task/add',    //AJAX任务添加
+	taskdetail:'/index.php/task/detail', //AJAX获得任务回复列表
+	tasknext:'/index.php/task/next',  //AJAX回复任务
+	taskedit:'',
+	consult:'/index.php/consulttest/',
+	consultlist:'/index.php/consulttest/consult_list',
+	consultadd:'/index.php/consulttest/add_consult',
+	consultreply:'/index.php/consulttest/consult_replies'
 };
 //正则字典
 var REG={
@@ -50,5 +48,5 @@ var REG={
 	pname:/^[a-zA-Z0-9中文]{1,20}$/,  //部门名称
 	jname:/^[a-zA-Z0-9中文]{1,20}$/,   //职务名称
 	url:/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z中文]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/, //url地址
-	title:/^[\w中文]{1,50}$/
+	title:/^[\w中文\s]{1,50}$/
 };
