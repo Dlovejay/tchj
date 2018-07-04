@@ -34,7 +34,13 @@ class Consult extends MY_Controller
 
         $user_info = $this->session->userdata('user');
         # 就不做校验了  对于不合法的数据 当成没有这个条件
-        $where = ' c.pid = ' . $user_info['pid'];
+        # 还需要看用户是什么级别,如果不是领导 那就只能看自己发布的请示
+        if($user_info['tid'] == USERD){
+            $where = ' c.created_pid = ' . $user_info['pid'];
+        }else{
+            $where = ' c.pid = ' . $user_info['pid'];
+        }
+
         if(!empty($create_uid)){
             $where .= ' AND c.uid = ' . $create_uid;
         }
@@ -48,10 +54,7 @@ class Consult extends MY_Controller
             $where .= ' AND c.create_date <= "' . $end_date . '"';
         }
 
-        # 还需要看用户是什么级别,如果不是领导 那就只能看自己发布的请示
-        if($user_info['tid'] == USERD){
-            $where .= ' AND c.uid = ' . $user_info['uid'];
-        }
+
         if(!empty($page)){
             $page = 1;
         }
@@ -108,7 +111,8 @@ class Consult extends MY_Controller
             'annex' => $annex,
             'uid' => $user_info['uid'],
             'status' => 0,
-            'pid' => $pid
+            'pid' => $pid,
+            'created_pid' => $user_info['pid']
         );
 
         if($this->db->insert('consultlist', $data)){
@@ -343,5 +347,18 @@ class Consult extends MY_Controller
 
         echo json_encode($return);
         exit();
+    }
+
+    public function consult_statistics()
+    {
+        $user_info = $this->session->userdata('user');
+        $this->load->model('ConsultList');
+
+        $consult_info = $this->ConsultList->consult_statistics($user_info['pid']);
+
+        $return = rexGetMReturn();
+        $return['data'] = $consult_info;
+        echo json_encode($return);
+        exit;
     }
 }
