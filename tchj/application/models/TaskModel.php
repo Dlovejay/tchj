@@ -327,18 +327,20 @@ class TaskModel extends CI_Model
             $v['departmentIds'] = explode(",", $v['departments']);
         }
 
+        $data = array();
+
         if ($user['tid'] == 1 || $user['tid'] == 2) {
-            $data = array('total' => array('pid' => 0, 'name' => '总计', 'count' => $this->count($result, 0)));
+            $data[] = array('pid' => 0, 'name' => '总计', 'count' => $this->count($result, 0));
             $CI =& get_instance();
             $CI->load->model('Department');
             $departments = $CI->Department->getListByLevels(array(1));
             foreach ($departments as $d) {
-                $data[$d['pid']] = array('pid' => $d['pid'], 'name' => $d['pname'], 'count' => $this->count($result, $d['pid']));
+                $data[] = array('pid' => $d['pid'], 'name' => $d['pname'], 'count' => $this->count($result, $d['pid']));
             }
         } else {
-            $data = array($user['pid'] => array('pid' => $user['pid'], 'name' => '总计', 'count' => $this->count($result, $user['pid'])));
+            $data[] = array('pid' => $user['pid'], 'name' => '总计', 'count' => $this->count($result, $user['pid']));
         }
-        
+
 
         return $data;
     }
