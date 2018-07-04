@@ -216,6 +216,7 @@ class Task extends MY_Controller{
     // 验证 插入和修改的数据
     private function check($user, $self) {
         $this->load->library('form_validation');
+        $self->load->model('Department');
 
         $data = array(
             'title' => $this->input->post('title'),
@@ -225,7 +226,12 @@ class Task extends MY_Controller{
             'end_at' => $this->input->post('end_at'),
             'annex' => $this->input->post('annex'),
             'departments' => $this->input->post('departments'),
+            'initiate_pid' => $this->input->post('initiate_pid'),
         );
+
+        if (empty($data['initiate_pid'])) {
+            $data['initiate_pid'] = 0;
+        }
 
         //print_r($data);exit;
 
@@ -275,7 +281,6 @@ class Task extends MY_Controller{
                                 return false;
                             }
 
-                            $self->load->model('Department');
                             $departments = $self->Department->getListByLevels($levels);
                             $departmentIds = array();
                             foreach($departments as $d) {
@@ -313,6 +318,37 @@ class Task extends MY_Controller{
                 ),
                 "errors" => array (
                     "anonymous" => "附件格式错误",
+                )
+            ),
+            array(
+                'field' => 'initiate_pid',
+                'label' => '发起部门id',
+                'rules' => array(
+                    'integer',
+                    array (
+                        "anonymous",
+                        function ($value) use ($user, $self) {
+                            if ($user["tid"] == 2 && $value != 0) {
+                                return false;
+                            }
+
+                            if ($user["tid"] == 3) {
+                                $departments = $self->Department->getListByLevels(array(1));
+                                $departmentIds = array();
+                                foreach($departments as $d) {
+                                    $departmentIds[] = $d["pid"];
+                                }
+
+                                if (!in_array($value, $departmentIds)) {
+                                    return false;
+                                }
+                                return true;
+                            }
+                        }
+                    )
+                ),
+                "errors" => array (
+                    "anonymous" => "发起部门id格式错误",
                 )
             )
         );
