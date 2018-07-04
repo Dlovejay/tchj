@@ -4,6 +4,7 @@
 //相关配置
 var CFG={
 	ver: "Ver1.0",
+	FTP: "http://192.168.1.201:21/",
 	UM:1,
 	UL:2,
 	UU:3,
@@ -27,7 +28,11 @@ var URL={  //本站URL地址
 	jobedit:'/index.php/general/jobedit', //AJAX职务修改
 	jobdrop:'/index.php/general/jobdrop', //AJAX职务删除
 	overview:'/rextest/overview',
-	mission:'/rextest/mission',
+	task:'/index.php/tasktest/',   //HTTP任务列表页面
+	tasklist:'/index.php/tasktest/lists', //AJAX任务列表
+	taskadd:'/index.php/tasktest/add',    //AJAX任务添加
+	taskdetail:'/index.php/tasktest/detail', //AJAX获得任务回复列表
+	tasknext:'/index.php/tasktest/next',  //AJAX回复任务
 	missionlist:'/rextest/missionlist',
 	missionadd:'/rextest/missionadd',
 	returnlist:'/rextest/returnlist',
@@ -44,5 +49,6 @@ var REG={
 	tel:/^\d{1,4}[\-\s]?\d{1,4}[\-\s]?\d{3,11}$/,	//联系电话
 	pname:/^[a-zA-Z0-9中文]{1,20}$/,  //部门名称
 	jname:/^[a-zA-Z0-9中文]{1,20}$/,   //职务名称
-	url:/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z中文]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/ //url地址
+	url:/^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z中文]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/, //url地址
+	title:/^[\w中文]{1,50}$/
 };

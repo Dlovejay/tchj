@@ -28,7 +28,7 @@
 		<a class="fa fa-list-alt" v-if="me.tid==cfg.UM" v-bind:href="url.job" target="contentshow" v-bind:class="{'sel':nowSel==2}" @click="setSel(2)">&ensp;职务管理</a>
 		<a class="fa fa-group" v-if="me.tid==cfg.UM" v-bind:href="url.user" target="contentshow" v-bind:class="{'sel':nowSel==3}" @click="setSel(3)">&ensp;用户管理</a>
 		<a class="splitBar fa fa-bar-chart-o" v-bind:href="url.overview" target="contentshow" v-bind:class="{'sel':nowSel==4}" @click="setSel(4)">&ensp;工作概览</a>
-		<a class="fa fa-calendar" v-bind:href="url.mission" target="contentshow" v-bind:class="{'sel':nowSel==5}" @click="setSel(5)">&ensp;任务列表</a>
+		<a class="fa fa-calendar" v-bind:href="url.task" target="contentshow" v-bind:class="{'sel':nowSel==5}" @click="setSel(5)">&ensp;任务列表</a>
 		<a class="fa fa-paste" v-bind:href="url.consult" target="contentshow" v-bind:class="{'sel':nowSel==6}" @click="setSel(6)">&ensp;请示列表</a>
   </nav>
 	<div class="rexRightpart">

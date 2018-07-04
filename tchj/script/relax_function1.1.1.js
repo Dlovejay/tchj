@@ -573,8 +573,15 @@ function formatDateTime(dateObj,typeStr,splitStr,fullFormat){
 			t[x] = t[x]>=10? t[x]:"0"+t[x];
 		}
 	}
-	var tempStr = t.y + "/" + t.m + "/" + t.d + " " + t.h + ":" + t.n + ":" + t.s;
-  if (splitStr==="-") tempStr=tempStr.replace(/\//g,"-");
+	var tempStr = t.y + "年" + t.m + "月" + t.d + "日 " + t.h + ":" + t.n + ":" + t.s;
+	if (splitStr!=='c'){
+		tempStr=tempStr.replace('日','');
+		if (splitStr===undefined || splitStr==='/'){
+			tempStr=tempStr.replace(/[^\d\:\s]/g,'/');
+		}else if(splitStr==='-'){
+			tempStr=tempStr.replace(/[^\d\:\s]/g,'-');
+		}
+	}
 	if (typeStr!=="date" && typeStr!=="time"){
 		return tempStr;
 	}else{
