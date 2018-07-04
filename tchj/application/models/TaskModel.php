@@ -76,16 +76,16 @@ class TaskModel extends CI_Model
 
     public function getJoinWhere($user, $params = array()) {
         $join = " task AS t ";
-        $where = " 1=1 ";
+        $where = " t.status !=6 ";
         $param = array();
         $time = time();
         if ($user["tid"] == USERM) {
 
         } else if ($user["tid"] == USERL) {
-            $where = " !(t.status = 1 AND t.start_at>{$time} AND t.pid != {$user['pid']}) ";
+            $where = $where." AND !(t.status = 1 AND t.start_at>{$time} AND t.pid != {$user['pid']}) ";
         } else {
             $join = " task AS t LEFT JOIN task_department_relation  AS r ON t.mid=r.mid AND t.pid != {$user['pid']} ";
-            $where = " !(t.status = 1 AND t.start_at>{$time} AND t.pid != {$user['pid']}) AND (t.pid = {$user['pid']} OR r.pid={$user['pid']} OR r.pid=0 )";
+            $where = $where." AND !(t.status = 1 AND t.start_at>{$time} AND t.pid != {$user['pid']}) AND (t.pid = {$user['pid']} OR r.pid={$user['pid']} OR r.pid=0 )";
         }
 
         if (isset($params["status"]) && $params["status"] !=="" && in_array($params["status"], array(0,1,2,3,4,5,6,7))) {
@@ -204,7 +204,7 @@ class TaskModel extends CI_Model
 
 
     public function getOneById($id) {
-        $sql = "SELECT * FROM ".$this->table." WHERE mid= ?";
+        $sql = "SELECT * FROM ".$this->table." WHERE mid= ? AND `status` != 6";
         return $this->db->query($sql, $id)->row_array();
     }
 
@@ -320,7 +320,7 @@ class TaskModel extends CI_Model
         //array("join" => $join, "where" => $where, "params" => $param);
         $field = array('t.mid', 't.start_at', 't.end_at', 't.count', 't.status', 't.is_timeout', 't.departments', 't.pid');
         $mysqlParams = $this->getJoinWhere($user, array());
-        $sql = " SELECT " . implode(",", $field) . " FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"] . " AND t.`status` != 6 ";
+        $sql = " SELECT " . implode(",", $field) . " FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"];
         $result = $this->db->query($sql, $mysqlParams["params"])->result_array();
         foreach($result as &$v) {
             $v['timeout'] = $this->isTimeout($v);

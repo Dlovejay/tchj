@@ -197,7 +197,7 @@ class Task extends MY_Controller{
         $timeout = $this->TaskModel->isTimeout($task);
         $canEdit = $this->TaskModel->canEdit($task, $user);
 
-        rexAjaxReturn(0,"",array("is_timeout" => $timeout, "do" => $dos, 'canEdit' => $canEdit));
+        rexAjaxReturn(0,"",array("is_timeout" => $timeout, "do" => $dos, 'canEdit' => $canEdit, 'status'=>$task['status']));
     }
 
 
