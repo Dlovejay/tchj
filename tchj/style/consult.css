@@ -7,10 +7,16 @@
 .nowStatus.st2{ background-color:#1ba50c; border-color:#1ba50c;}
 .nowStatus.st2:before{ content:'已完成'; color:#fff;}
 
-#viewOP .dialog-content,#inforOP .dialog-content{ background-color:#eee;}
+#viewOP .dialog-content,#taskop .dialog-content{ background-color:#eee;}
 .datafill{ background-color:#fff; padding-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,.2);}
 .buttonBar{ text-align:center; padding:10px;}
 .buttonBar .rexButton{ width:100px; margin:0 5px;}
+.buttonBar .tipMessage{ padding-top:0;}
+.buttonBar .tipMessage .fa{ padding:6px 20px; background-color:#fff; border:1px solid #ccc;}
+.buttonBar .tipMessage .warning{ border-color:#f90;}
+.buttonBar .tipMessage .alert{ border-color:red;}
+.buttonBar .tipMessage .ok{ border-color:green;}
+.buttonBar .tipMessage .loading{ border-color:#697ac1;}
 
 .lay2col.style1>*{ min-width:200px;}
 .txt.fa-clock-o{ color:red;}

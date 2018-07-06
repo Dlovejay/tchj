@@ -337,10 +337,10 @@ body{ font-size:14px;}
 .formpart>span{ display:inline-block; vertical-align:middle; padding-right:20px; width:calc(100% - 110px); text-align:left;}
 .formpart>.request:after{ content:'*'; font-size:1.4em; color:red; position:absolute; top:50%; margin-top:-9px; padding-left:3px;}
 .formpart>span input[type='text'],.formpart>span input[type='password'],.formpart>span input[type='date'],.formpart>span textarea{ width:100%;}
-.formpart>span .rexTurn{ margin:3px;}
+.formpart>span .rexTurn{ margin:3px 5px 3px 0;}
 
 /* 分页 */
-.cutpage{ text-align:center; margin:0 auto;}
+.cutpage{ text-align:center; margin:0 auto; padding:10px;}
 .cutpage>*{ margin:2px;}
 /* 对话框样式 */
 .dialog-title{ background-color:#7278ad; color:#eff1ff;}

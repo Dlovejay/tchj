@@ -183,8 +183,11 @@ class Task extends MY_Controller{
         //获取新的状态
         $task = $this->TaskModel->getOneById($task['mid']);
         if(empty($task)) {
-            rexAjaxReturn(401, "任务不存在");
-            return;
+						//删除任务
+						rexAjaxReturn(0,"");
+						return;
+            //rexAjaxReturn(401, "任务不存在");
+            //return;
         }
 
         $this->TaskModel->toUnstartStatus($task);

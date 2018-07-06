@@ -293,4 +293,8 @@ class General extends MY_Controller{
 		$result=$this->Base->jobOP('drop',$indata);
 		rexAjaxReturn($result);
 	}
+	
+	public function overview(){  //概览
+		$this->load->view('general/overview.php');
+	}
 }
