@@ -26,6 +26,7 @@
 						<th width="80">状态</th>
 						<th width="25%">请示标题</th>
 						<th>发布时间</th>
+						<th>投递给</th>
 						<th width="9%">发布人</th>
 						<th width="60">附件</th>
 						<th width="60">回复</th>
@@ -35,12 +36,13 @@
 						<td>{{(pager.page-1)*pager.pagesize+index+1}}</td>
 						<td><strong class="nowStatus" v-bind:class="'st'+item.status"></strong></td>
 						<td><span class="txt">{{item.title}}</span></td>
-						<td>{{item.datemake}}</td>
-						<td>{{item.author}}</td>
+						<td>{{item.date}}</td>
+						<td>{{item.pname}}</td>
+						<td>{{item.username}}</td>
 						<td>{{item.annex.length}}</td>
 						<td>{{item.rcount}}</td>
 						<td>
-							<button class="rexButton ss fa fa-eye infor" @click="showDialog('viewOP',item.cid)"> 查看</button>
+							<button class="rexButton ss fa fa-eye infor" @click="showDialog('viewop',item.cid)"> 查看</button>
 						</td>
 					</tr>
 					<tr class="alone" v-if="chk[0].flag!=''">
@@ -64,7 +66,7 @@
 				</div>
 				<div class="dialog-content">
 					<div class="datafill">
-						<ul class="lay2col">
+						<ul class="lay2col sP1">
 							<li class="formpart">
 								<label class="rexLabel">请示标题</label><span class="request">
 									<input type="text" class="rexInput" v-bind:class="{'warning':chk[1].obj=='title'}" v-model.trim="edit.title" autocomplete="off" maxlength="50"/>
@@ -160,6 +162,173 @@
 			</div>
 		</div>
 					
+		<!-- 查看详情弹出页面 -->
+		<div id="viewop" class="extPage">
+			<div class="dialogFrame">
+				<div class="dialog-title">
+					<span class="opBnt right fa fa-lg fa-times" @click="hideDialog('viewop')"></span>
+					<span class="opBnt left fa fa-lg fa-pencil" title="修改当前请示信息" v-if="canDo && canEdit" @click="showDialog('consultop')"></span>
+					<h4 class="t3"><span class="fa fa-eye"></span>&emsp;<span class="diy">查看请示详情</span></h4>
+				</div>
+				<div class="dialog-content">
+					<div class="datafill">
+						<ul class="lay2col">
+							<li class="formpart view">
+								<label class="rexLabel">请示状态</label><span>
+									<span class="nowStatus" v-bind:class="'st'+viewobj.status"></span>
+								</span>
+							</li>
+							<li class="formpart view">
+								<label class="rexLabel">请示标题</label><span>{{viewobj.title}}</span>
+							</li>
+							<li class="formpart view">
+								<label class="rexLabel">发&ensp;布&ensp;人</label><span>{{viewobj.username}}</span>
+							</li>
+							<li class="formpart view">
+								<label class="rexLabel">发布日期</label><span>{{viewobj.date}}</span>
+							</li>
+							<li class="alone formpart view">
+								<label class="rexLabel">请示内容</label><span>{{viewobj.content}}</span>
+							</li>
+							<li class="alone formpart table">
+								<table class="rexRowtable notitle fixed">
+									<caption class="captionTitle">
+										<span class="fa fa-chain"> 附件列表</span>
+									</caption>
+									<tr v-for="(item,index) in viewobj.annex">
+										<td width="35">{{index+1}}</td>
+										<td><a v-bind:href="getFileURL(item)" target="_blank">{{item.name}}</a></td>
+										<td width="10">
+										</td>
+									</tr>
+									<tr class="alone" v-if="viewobj && viewobj.annex.length==0">
+										<td colspan="3" class="tipMessage"><span class="fa warning"> 暂无任何列表信息</span></td>
+									</tr>
+								</table>
+							</li>
+							<li class="alone formpart table returnList">
+								<div class="captionTitle">
+									<span class="fa fa-comments-o"> 回复列表</span>
+								</div>
+								<div v-for="item in returnList[viewobj.cid]" v-bind:class="item.classstr">
+									<span class="reuser"><strong>{{item.username}}</strong>{{item.create_date}}</span>
+									<div class="recontent">{{item.content}}</div>
+								</div>
+								<div class="tipMessage" v-if="chk[3].flag">
+									<span class="fa" v-bind:class="chk[3].flag"> {{chk[3].msg}}</span>
+								</div>
+							</li>
+						</ul>
+					</div>
+					<div class="buttonBar" v-if="me.tid!=CFG.UM">
+						<button class="rexButton infor" @click="showDialog('sure','RECEIVE')" v-if="canDo && canReceive">受理请示</button>
+						<button class="rexButton infor" @click="showDialog('answer')" v-if="canDo && canReply">回复请示</button>
+						<button class="rexButton alert" @click="showDialog('sure','DELETE')" v-if="canDo && canDelete">删除请示</button>
+						<button class="rexButton alert" @click="showDialog('sure','REPEAL')" v-if="canDo && canRepeal">撤销请示</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 确认操作提示信息 -->
+		<div id="sure" class="extDialog" noclick="noclick">
+			<div class="dialogFrame">
+				<div class="dialog-title warning">
+					<h4 class="t3"><span class="fa fa-exclamation-circle"></span>&emsp;<span class="diy">系统信息提示</span></h4>
+				</div>
+				<div class="dialog-buttonBar">
+					<div class="bntInside">
+						<button class="rexButton" @click="hideDialog('sure')" v-bind:disabled="load.re"> 取 消</button>
+						<button class="rexButton infor" @click="doSure()" v-bind:disabled="load.re"> 确 定</button>
+					</div>
+				</div>
+				<div class="dialog-content">
+					<div class="diy sP1"></div>
+					<div class="tipMessage" v-if="chk[4].flag">
+						<span class="fa" v-bind:class="chk[4].flag"> {{chk[4].msg}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 回复弹框 -->
+		<div id="answer" class="extDialog" noclick="noclick">
+			<div class="dialogFrame">
+				<div class="dialog-title">
+					<span class="opBnt right fa fa-lg fa-times" @click="hideDialog('answer')" v-if="!load.re"></span>
+					<h4 class="t3"><span class="fa fa-comment-o"></span>&emsp;<span class="diy">任务进度回复</span></h4>
+				</div>
+				<div class="dialog-buttonBar">
+					<div class="bntInside">
+						<button class="rexButton opBnt infor" @click="doSure()" v-bind:disabled="load.re"> 提交回复</button>
+					</div>
+				</div>
+				<div class="dialog-content">
+					<ul class="lay2col style1 sP1">
+						<li class="formpart alone">
+							<label class="rexLabel">标记请示</label><span>
+								<span class="rexCheck" style="margin-right:10px">
+									<input type="radio" name="returntype" value="1" v-model="answer.complete"/>
+									<label>已通过</label>
+								</span>
+								<span class="rexCheck">
+									<input type="radio" name="returntype" value="0" v-model="answer.complete"/>
+									<label>暂未完成</label>
+								</span>
+							</span>
+						</li>
+						<li class="formpart alone">
+							<label class="rexLabel">回复内容</label><span class="request">
+								<textarea class="rexTxtarea" v-model.trim="answer.content" v-bind:class="{'warning':chk[4].obj=='content'}"></textarea>
+							</span>
+						</li>
+					</ul>
+					<div class="tipMessage" v-if="chk[4].flag">
+						<span class="fa" v-bind:class="chk[4].flag"> {{chk[4].msg}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 查询条件编辑 -->
+		<div id="selreal" class="extDialog">
+			<div class="dialogFrame">
+				<div class="dialog-title">
+					<span class="opBnt right fa fa-lg fa-times" @click="hideDialog('selreal')"></span>
+					<h4 class="t3"><span class="fa fa-search"></span>&emsp;<span class="diy">编辑查询条件</span></h4>
+				</div>
+				<div class="dialog-buttonBar">
+					<div class="bntInside">
+						<button class="rexButton opBnt" @click="clearRealation()" v-bind:disabled="this.load.op"> 重 置</button>
+						<button class="rexButton opBnt infor" @click="goSearch()" v-bind:disabled="this.load.op"> 查 询</button>
+					</div>
+				</div>
+				<div class="dialog-content">
+					<ul class="lay2col style2 sP1">
+						<li class="formpart alone">
+							<label class="rexLabel">状&emsp;态</label><span>
+								<select class="rexSelect" v-model="real.status" v-bind:disabled="this.load.op">
+									<option value=""></option>
+									<option value="0">待受理</option>
+									<option value="1">处理中</option>
+									<option value="2">已完成</option>
+									<option value="3">已撤销</option>
+								</select>
+							</span>
+						</li>
+						<li class="formpart alone">
+							<label class="rexLabel">标&emsp;题</label><span>
+								<input type="text" class="rexInput" v-model.trim="real.keywords" v-bind:class="{'warning':chk[1].obj=='keywords'}" v-bind:disabled="this.load.op"/>
+							</span>
+						</li>
+					</ul>
+					<div class="tipMessage" v-if="chk[1].flag" v-bind:class="chk[1].flag">
+						<span class="fa fa-lg" v-bind:class="chk[1].flag"> {{chk[1].msg}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
 	</div>
 	
 	<div id="user" class="dataField"><?php echo json_encode($user); ?></div>

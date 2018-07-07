@@ -36,9 +36,13 @@ var URL={  //本站URL地址
 	tasknext:'/index.php/task/next',  //AJAX回复任务
 	taskedit:'/index.php/task/edit',  //AJAX任务编辑
 	consult:'/index.php/consult/',
-	consultlist:'/index.php/consult/consult_list',
-	consultadd:'/index.php/consult/add_consult',
-	consultreply:'/index.php/consult/consult_replies'
+	consultlist:'/index.php/consult/consult_list', //请示列表
+	consultadd:'/index.php/consult/add_consult',   //添加请示
+	consultreply:'/index.php/consult/consult_replies',  //回复列表
+	consultanswer:'/index.php/consult/replies_consult',  //请示回复
+	consultdel:'/index.php/consult/del_consult',   //删除请示
+	consulteidt:'/index.php/consult/edit_consult', //请示修改
+	consultover:'/index.php/consult/consult_statistics' //请示概览
 };
 //正则字典
 var REG={

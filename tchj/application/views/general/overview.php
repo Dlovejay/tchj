@@ -40,79 +40,259 @@ h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; backgr
 			<h2 class="bkStyle1"><span class="fa fa-bar-chart-o"></span> 工作概览</h2>
 		</div>
 		<div class="rexRightpart">
-			<ul class="rexTab tCT">
-				<li class="rexItem" v-for="(item,index) in task" v-bind:class="{'sel':viewindex==index}" @click="changeView(index)">{{item.name}}</li>
+			<ul class="rexTab tCT" v-if="datalist.length>1">
+				<li class="rexItem" v-for="(item,index) in datalist" v-bind:class="{'sel':viewindex==index}" @click="changeView(index)">{{item.pname}}</li>
 			</ul>
-			<div v-for="(item,index) in task" v-if="viewindex==index">
+			<div v-for="(item,index) in datalist" v-if="viewindex==index">
 				<div class="overview">
 					<h3><span class="fa fa-calendar"></span>任务统计</h3>
-					<div class="inside">
+					<div class="inside" v-if="task['0']">
 						<div class="part show1">
-							<span title="首次完成率=无退回完成的任务数/完成的任务总数"> 首次完成率 <strong>{{item.count.first_finish_percent}}%</strong></span>
-							<span title="提交率=已提交待审核的任务数/进行中的任务总数"> 提交率 <strong>{{item.count.reply_percent}}%</strong></span>
+							<span title="首次完成率=无退回完成的任务数/完成的任务总数"> 首次完成率 <strong>{{task[item.pid].first}}</strong></span>
+							<span title="提交率=已提交待审核的任务数/进行中的任务总数"> 提交率 <strong>{{task[item.pid].reply}}</strong></span>
 						</div>
 						<div class="part">
-							<span class="all">任务总数 <strong class="rexTip">{{item.count.total}}</strong></span>
-							<span class="now">进行中 <strong class="rexTip">{{item.count.doing}}</strong></span>
-							<span class="remove">超时 <strong class="rexTip">{{item.count.timeout}}</strong></span>
-							<span class="remove">已撤销 <strong class="rexTip">{{item.count.repeal}}</strong></span>
+							<span class="all">任务总数 <strong class="rexTip">{{task[item.pid].total}}</strong></span>
+							<span class="now">进行中 <strong class="rexTip">{{task[item.pid].doing}}</strong></span>
+							<span class="remove">超时 <strong class="rexTip">{{task[item.pid].timeout}}</strong></span>
+							<span class="remove">已撤销 <strong class="rexTip">{{task[item.pid].repeal}}</strong></span>
 						</div>
 					</div>
 				</div>
 				<div class="overview style">
 					<h3><span class="fa fa-paste"></span>请示统计</h3>
-					<div class="inside">
+					<div class="inside"  v-if="consult['0']">
 						<div class="part">
-							<span class="all">请示总数 <strong class="rexTip all">123</strong></span>
-							<span class="now">进行中 <strong class="rexTip now">120</strong></span>
-							<span class="remove">已撤销 <strong class="rexTip remove">0</strong></span>
+							<span class="all">请示总数 <strong class="rexTip all">{{consult[item.pid].total}}</strong></span>
+							<span class="now">进行中 <strong class="rexTip now">{{consult[item.pid].doing}}</strong></span>
+							<span class="remove">已撤销 <strong class="rexTip remove">{{consult[item.pid].repeal}}</strong></span>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		
+		<div id="loading" class="extDialog" noclick="noclick">
+			<div class="dialogFrame">
+				<div class="dialog-title">
+					<h4 class="t3"><span class="fa fa-exclamation-circle"></span>&emsp;<span class="diy">加载中提示</span></h4>
+				</div>
+				<div class="dialog-content">
+					<div class="tipMessage sP1">
+						<span class="fa" v-bind:class="chk.flag"> {{chk.msg}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="showinfor" class="extDialog" noclick="noclick">
+			<div class="dialogFrame">
+				<div class="dialog-title warning">
+					<h4 class="t3"><span class="fa fa-exclamation-circle"></span>&emsp;<span class="diy">系统信息提示</span></h4>
+				</div>
+				<div class="dialog-buttonBar">
+					<div class="bntInside">
+						<button class="rexButton" @click="hideDialog('showinfor')"> 取 消</button>
+						<button class="rexButton infor" @click="getTask()" v-bind:disabled="load.re"> 重 试</button>
+					</div>
+				</div>
+				<div class="dialog-content">
+					<div class="tipMessage">
+						<span class="fa" v-bind:class="chk.flag"> {{chk.msg}}</span>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
+	
 	<script src="/script/vue-2.5.9.min.js"></script>
 	<script src="/script/jquery-1.12.4.min.js"></script>
 	<script src="/script/relax_function1.1.1.js"></script>
 	<script src="/script/relax_ajax.js"></script>
+	<script src="/script/dialog1.3.1.js"></script>
 	<script src="/script/config.js"></script>
 <script>
 var vu=new Vue({
 	el: "#app",
 	data:{
-		task:[],
-		consult:[],
-		load1:false,
-		load2:false,
+		task:{},
+		consult:{},
+		load:false,
+		ajaxtype:'',
+		error:{},
+		chk:{
+			flag:'',
+			msg:''
+		},
 		viewindex:0
 	},
+	computed:{
+		datalist: function(){
+			var temp=[];
+			if (this.task['0']){
+				for (var x in this.task){
+					temp.push({pid:x,pname:this.task[x].pname});
+				}
+			}else if (this.consult['0']){
+				for (var x in this.consult){
+					temp.push({pid:x,pname:this.consult[x].pname});
+				}
+			}
+			return temp;
+		}
+	},
 	methods:{
+		showDialog: function(txt){
+			dialog.open(txt);
+		},
+		hideDialog: function(txt){
+			if (txt=='loading'){
+				this.chk.flag='';
+				this.chk.msg='';
+			}
+			dialog.close(txt);
+		},
 		AJAXbefore: function(){
-
+			this.load=true;
+			this.chk.flag='loading';
+			if (this.ajaxtype=='task'){
+				this.chk.msg='正在加载任务统计信息，请稍后...';
+			}else{
+				this.chk.msg='正在加载请示统计信息，请稍后...';
+			}
+			this.showDialog('loading');
 		},
 		AJAXerror: function(code,msg){
-
+			var tempMsg='';
+			this.error[this.ajaxtype]=code+' '+msg;
+			if (this.ajaxtype=='task'){
+				if (this.error['consult']){
+					tempMsg=this.error['consult']+'\n'+code+' '+msg;
+				}else{
+					if (!this.consult['0']){
+						this.getConsult();
+						return;
+					}
+				}
+			}else{
+				if (this.error['task']){
+					tempMsg=this.error['task']+'\n'+code+' '+msg;
+				}else{
+					if (!this.task['0']){
+						this.getTask();
+						return;
+					}
+				}
+			}
+			this.hideDialog('loading');
+			this.load=false;
+			this.chk.flag='alert';
+			this.chk.msg=tempMsg;
+			this.showDialog('showinfor');
 		},
 		AJAXsuccess: function(data){
-			this.task=data.data;
+			if (this.ajaxtype=='task'){
+				this.task=this._makeTask(data.data);
+				if (!this.error['consult'] && !this.consult['0']){
+					this.getConsult();
+					return;
+				}
+			}else{
+				this.consult=this._makeConsult(data.data);
+				if (!this.error['task'] && !this.task['0']){
+					this.getTask();
+					return;
+				}
+			}
+			this.ajaxtype='';
+			this.hideDialog('loading');
+		},
+		getData: function(){
+			if (!this.consult['0']){
+				this.getConsult();
+			}else if(!this.task['0']){
+				this.getTask();
+			}
+		},
+		getAll: function(){
+			this.task={};
+			this.consult={};
+			this.error={};
+			this.getData();
 		},
 		getTask: function(){
-			ajax1.send();
+			this.ajaxtype='task';
+			ajax.url=URL.taskover;
+			ajax.send();
+		},
+		getConsult: function(){
+			this.ajaxtype='consult';
+			ajax.url=URL.consultover;
+			ajax.send();
 		},
 		changeView: function(index){
 			if (this.viewindex==index) return;
 			this.viewindex=index;
+		},
+		_makeTask: function(data){
+			var first=data[0].count;
+			var temp={};
+			temp['0']={
+				pid: 0,
+				pname: '总计',
+				total: first.total,
+				doing: first.doing,
+				repeal: first.repeal,
+				timeout: first.timeout,
+				first: first.first_finish_percent+'%',
+				reply: first.reply_percent+'%'
+			};
+			for (var i=1; i<data.length; i++){
+				var temp2=data[i];
+				temp[temp2.pid]={
+					pid: temp2.pid,
+					pname: temp2.name,
+					total: temp2.count.total,
+					doing: temp2.count.doing,
+					repeal: temp2.count.repeal,
+					timeout: temp2.count.timeout,
+					first: temp2.count.first_finish_percent+'%',
+					reply: temp2.count.reply_percent+'%'
+				};
+			}
+			return temp;
+		},
+		_makeConsult: function(data){
+			var temp={};
+			temp['0']={
+				pid:0,
+				pname:'总计',
+				total: data.total,
+				doing: data.total_ongoing,
+				repeal: data.total_revoke
+			}
+			if (data.departments.length>1){
+				for (var i=0; i<data.departments.length; i++){
+					var temp2=data.departments[i];
+					temp[temp2.pid]={
+						pid: temp2.pid,
+						pname: temp2.pname,
+						total: temp2.total_cnt,
+						doing: temp2.ongoing_cnt,
+						repeal: temp2.revoke_cnt
+					};
+				}
+			}
+			return temp;
 		}
 	}
 });
-var ajax1=new relaxAJAX();
-var ajax2=new relaxAJAX();
-ajax1.url=URL.taskover;
-ajax1.before=vu.AJAXbefore;
-ajax1.error=vu.AJAXerror;
-ajax1.success=vu.AJAXsuccess;
-vu.getTask();
+var dialog=relaxDialog();
+var ajax=new relaxAJAX();
+ajax.before=vu.AJAXbefore;
+ajax.error=vu.AJAXerror;
+ajax.success=vu.AJAXsuccess;
+vu.getData();
 </script>
 </body>
 </html>

@@ -8,7 +8,7 @@ var vu=new Vue({
 		op:'',    //操作类型 add添加操作 edit修改操作
 		ajaxtype:'', //当前ajax合并未一个ajax对象，不同的ajax操作类型记录到ajaxtype
 		list:[],
-		reflist:{}, //mid对照表,
+		reflist:{}, //cid对照表,
 		returnList:{},
 		isPublic:false, //是否可以发布请示
 		pager:{         //分页对象
@@ -44,6 +44,10 @@ var vu=new Vue({
 			url:'',
 			name:''
 		},
+		answer:{  //回复相关
+			complete:1,
+			content:''
+		},
 		chk:'',  //提示信息 [0]列表 [1]添加，编辑 [2]附件操作 [3]回复操作
 		load:{
 			list:false,  //显示列表加载中标记
@@ -61,22 +65,35 @@ var vu=new Vue({
 			}
 			return tempArray;
 		},
-		bs1: function(){  //检查回复
-			if (this.viewobj){
-				if (this.viewobj.status==1 && this.viewobj.authorid!=this.me.uid) return true;
-			}
+		canDo: function(){  //回复/修改操作是否可进行的基本判定
+			if (this.load.re) return false;
+			if (!this.viewobj) return false;
+			if (!this.returnList[this.viewobj.cid]) return false;
+			return true;
+		},
+		canRepeal: function(){  //是否可以撤销
+			var temp=this.viewobj;
+			if (this.me.pid==temp.createpid && temp.status==1) return true;
 			return false;
 		},
-		bs3: function(){ //检查删除
-			if (this.viewobj){
-				if (this.viewobj.authorid==this.me.uid && this.viewobj.status==0) return true;
-			}
+		canDelete: function(){   //是否可以删除
+			var temp=this.viewobj;
+			if (this.me.pid==temp.createpid && temp.status=='0') return true;
 			return false;
 		},
-		bs4: function(){ //检查接受
-			if (this.viewobj && this.viewobj.status==0){
-				if (this.viewobj.authorid!=this.me.uid) return true;
-			}
+		canReply: function(){    //是否可以回复
+			var temp=this.viewobj;
+			if (this.me.pid==temp.pid && temp.status==1) return true;
+			return false;
+		},
+		canReceive: function(){  //是否可以接受任务
+			var temp=this.viewobj;
+			if (this.me.pid==temp.pid && temp.status=='0') return true;
+			return false;
+		},
+		canEdit: function(){  //是否可以修改
+			var temp=this.viewobj;
+			if (this.me.pid==temp.createpid && temp.status=='0') return true;
 			return false;
 		}
 	},
@@ -93,7 +110,23 @@ var vu=new Vue({
 			return tempArray;
 		},
 		_processList: function(obj){  	//加工单条任务信息为可显示的内容
-			return obj;
+			var dateStr=obj.create_date.split(' ')[0];
+			var pname=this.department[obj.pid]? this.department[obj.pid].pname:'unknow';
+			obj.annex=JSON.parse(obj.annex);
+			return {
+				cid: obj.id,
+				title: obj.title,
+				content: obj.content,
+				uid: obj.uid,
+				username: obj.username,
+				annex: obj.annex,
+				date: dateStr,
+				status: obj.status,
+				rcount: obj.rcount,
+				pid: obj.pid,  //请示投递的部门
+				pname: pname,
+				createpid: obj.created_pid  //发布请示的用户所在的部门
+			}
 		},
 		setChk: function(index,flag,msg,obj){ //设置提示信息
 			if (!this.chk[index]) return;
@@ -126,6 +159,7 @@ var vu=new Vue({
 			switch(txt){
 				case 'viewop':
 					this.viewobj=this.list[this.reflist[index]];
+					if (!this.returnList[this.viewobj.cid]) this.getAJAXDetail(); //获取反馈列表
 					break;
 				case 'consultop':
 					if (this.viewobj!==''){
@@ -134,8 +168,35 @@ var vu=new Vue({
 						this.edit.title=this.viewobj.title;
 						this.edit.content=this.viewobj.content;
 						this.edit.annex=this.viewobj.annex;
+						this.edit.pid=this.viewobj.pid;
 					}else{
 						this.op='add';
+					}
+					break;
+				case 'sure':
+					var content;
+					switch(index){
+						case 'RECEIVE':
+							content={content:'是否确认 <strong>受理</strong> 当前请示？'};
+							break;
+						case 'DELETE':
+							content={content:'是否确认 <strong>删除</strong> 当前请示？'};
+							break;
+						case 'REPEAL':
+							content={content:'是否确认 <strong>撤销</strong> 当前请示？'};
+							break;
+					}
+					this.ajaxtype=index;
+					dialog.open('sure',content);
+					return;
+				case 'answer':
+					this.answer.content='';
+					this.answer.complete=1;
+					this.ajaxtype='REPLY';
+					break;
+				case 'selreal':
+					for (var x in this.real){
+						this.real[x]=this.realbak[x];
 					}
 					break;
 			}
@@ -156,9 +217,19 @@ var vu=new Vue({
 					}
 					this.edit.annex=[];
 					this.op='';
+					this.clearChk(1);
 					break;
 				case 'viewop':
 					this.viewobj='';
+					this.clearChk(3);
+					break;
+				case 'sure':
+					this.ajaxtype='';
+					this.clearChk(4);
+					break;
+				case 'answer':
+					this.ajaxtype='';
+					this.clearChk(4);
 					break;
 			}
 			dialog.close(txt);
@@ -228,8 +299,7 @@ var vu=new Vue({
 						this.load.re=true;
 						this.setChk(4,'loading','正在重置任务状态，请稍等...');
 					}else{
-						tempArray=['REPLY','FINISHED'];
-						if (tempArray.indexOf(this.ajaxtype)>=0){
+						if (this.ajaxtype=='REPLY'){
 							this.load.re=true;
 							this.setChk(4,'loading','正在提交回复，请稍等...');
 						}
@@ -251,7 +321,7 @@ var vu=new Vue({
 					this.setChk(3,'alert',code+' '+msg);
 					break;
 				default:
-					var tempArray=['RECEIVE','DELETE','REPEAL','REPLY','FINISHED'];
+					var tempArray=['RECEIVE','DELETE','REPEAL','REPLY'];
 					if (tempArray.indexOf(this.ajaxtype)>=0){
 						this.load.re=false;
 						this.setChk(4,'alert',code+' '+msg);
@@ -286,24 +356,38 @@ var vu=new Vue({
 					}
 					break;
 				default:
-					var tempArray=['RECEIVE','DELETE','REPEAL','REPLY','FINISHED'];
+					var tempArray=['RECEIVE','DELETE','REPEAL','REPLY'];
 					if (tempArray.indexOf(this.ajaxtype)>=0){
 						if (data.code){
 							this.load.re=false;
 							this.setChk(4,'alert',data.message);
 							return;  //不能执行清空ajaxtype，否则继续提交会有问题
 						}else{
-							this.setAJAXNext(data.data);
-							return;
+							if (this.ajaxtype=='RECEIVE' || this.ajaxtype=='REPLY'){
+								this.setAJAXReply(data.data);
+							}else{
+								this.setAJAXDel(data.data);
+							}
 						}
 					}
 			}
 			this.ajaxtype='';
 		},
-		clearRealation: function(){ //清除查询条件
-			for (var x in this.real2){
-				this.real2[x]=this.real[x];
+		clearRealation: function(){  //清除查询条件
+			for (var x in this.real){
+				this.real[x]=this.realbak[x];
 			}
+		},
+		goSearch: function(){  //查询操作
+			//检查规范
+			if (this.real.keywords!='' && REG.title.check(this.real.keywords)==false){
+				this.setChk(1,'warning','查询标题关键字填写不规范','keywords');
+				return;
+			}
+			for (var x in this.real){
+				this.realbak[x]=this.real[x];
+			}
+			this.getAJAXList();
 		},
 		getAJAXList: function(pagenum){   //获取请示列表
 			if (pagenum===undefined){
@@ -319,12 +403,12 @@ var vu=new Vue({
 				keywords: this.realbak.keywords,
 				status: this.realbak.status,
 				page: this.pager.page,
-				pagesize: this.pager.pagesize
+				page_size: this.pager.pagesize
 			},
 			ajax.url=URL.consultlist;
 			ajax.send();
 		},
-		setAJAXList: function(data){
+		setAJAXList: function(data){  //列表返回处理
 			//this.pager.page=data.pager.page;
 			this.pager.total=data.length;
 			this.pager.pagecount=Math.ceil(this.pager.total/this.pager.pagesize);
@@ -334,9 +418,9 @@ var vu=new Vue({
 			this.returnList={};
 			if (this.pager.total!==0){
 				this.reflist={};
-				for (var i=0; i<data.list.length; i++){
-					this.list.push(this._processList(data.list[i]));
-					this.reflist[data.list[i].cid]=i;
+				for (var i=0; i<data.length; i++){
+					this.list.push(this._processList(data[i]));
+					this.reflist[data[i].id]=i;
 				}
 				if (this.viewobj){
 					this.viewobj=this.list[this.reflist[this.viewobj.cid]];
@@ -346,10 +430,10 @@ var vu=new Vue({
 				vu.setChk(0,'warning','没有找到对应的请示信息');
 			}
 		},
-		getAJAXAdd: function(){  //提交添加
+		getAJAXAdd: function(){  //添加请示提交
 			//检查相关项
 			if (REG.title.check(this.edit.title)==false){
-				this.setChk(1,'warning','请填写请示标题','title');
+				this.setChk(1,'warning','请填写请示标题或者标题填写包含了特殊字符','title');
 				return;
 			}
 			if (this.edit.content==''){
@@ -360,8 +444,15 @@ var vu=new Vue({
 				this.setChk(1,'warning','请选择请示需要投递给哪个上级部门');
 				return;
 			}
+			if (this.edit.annex.length==0){
+				if (!window.confirm('当前请示没有包含任务附件文件，是否仍然要提交？')) return;
+			}
 			this.ajaxtype='add';
-			ajax.url=URL.consultadd;
+			if (this.op=='add'){
+				ajax.url=URL.consultadd;
+			}else{
+				ajax.url=URL.consulteidt;
+			}
 			//标记发布部门
 			ajax.data={
 				id: this.edit.cid,
@@ -373,12 +464,131 @@ var vu=new Vue({
 			ajax.send();
 		},
 		setAJAXAdd: function(data){ //处理添加返回
-			console.log(data);
+			if (this.op=='add'){
+				this.setChk(1,'ok','请示已经添加成功');
+				setTimeout(function(){
+					vu.getAJAXList();
+					vu.load.op=false;
+					vu.hideDialog('consultop');
+				},1500);
+			}else{
+				this.setChk(1,'ok','请示已修改成功');
+				setTimeout(function(){
+					vu.getAJAXList();
+					vu.load.op=false;
+					vu.hideDialog('consultop');
+				},1500);
+			}
+		},
+		getAJAXDetail: function(){ //获取请示回复信息列表
+			delete this.returnList[this.viewobj.cid];
+			this.ajaxtype='detail';
+			ajax.data={
+				cid:this.viewobj.cid,
+				page:1,
+				pagesize:100
+			};
+			ajax.url=URL.consultreply;
+			ajax.send();
+		},
+		setAJAXDetail: function(data){  //请示回复设置
+			this.load.re=false;
+			this.clearChk(3);
+			var temp=[];
+			for (var i=0; i<data.length; i++){  //协调显示状态
+				temp[i]={};
+				var returner=this.user[data[i]['uid']];
+				if (returner){
+					temp[i].username=returner.username;
+					if (returner.uid==this.viewobj.uid){
+						temp[i].classstr='anmanager';
+					}else{
+						temp[i].classstr='anuser';
+					}
+				}else{
+					temp[i].username='unknow';
+					temp[i].classstr='anuser';
+				}
+				temp[i].create_date=data[i].create_date;
+				temp[i].content=data[i].content;
+			}
+			if (data.length==0) this.setChk(3,'warning','暂无任何回复信息');
+			Vue.set(this.returnList,this.viewobj.cid,temp);
+		},
+		doSure: function(){
+			switch(this.ajaxtype){
+				case 'RECEIVE':
+					this.answer.content='受理请示';
+					this.answer.complete=0;
+					this.getAJAXReply();
+					break;
+				case 'DELETE':
+					this.getAJAXDel();
+					break;
+				case 'REPEAL':
+					this.getAJAXDel();
+					break;
+				case 'REPLY':
+					if (this.answer.content==''){
+						this.setChk(4,'warning','请填写回复内容','content');
+						return;
+					}
+					this.getAJAXReply();
+					break;
+			}
+		},
+		getAJAXReply: function(){  //发送请示回复
+			ajax.data={
+				cid: this.viewobj.cid,
+				content: this.answer.content,
+				complete: this.answer.complete
+			};
+			ajax.url=URL.consultanswer;
+			ajax.send();
+		},
+		setAJAXReply: function(data){  //请示回复返回处理
+			if (this.ajaxtype=='REPLY'){
+				this.setChk(4,'ok','请示回复已发送成功');
+				if (this.answer.complete=='1'){
+					this.list[this.reflist[this.viewobj.cid]].status=2;
+				}
+			}else{
+				this.setChk(4,'ok','已成功受理该请示');
+				this.list[this.reflist[this.viewobj.cid]].status=1;
+			}
+			this.list[this.reflist[this.viewobj.cid]].rcount++;
+			setTimeout(function(){
+				vu.hideDialog('sure');
+				vu.hideDialog('answer');
+				//刷新回复列表
+				vu.getAJAXDetail();
+			},1500);
+		},
+		getAJAXDel: function(){  //删除请示
+			ajax.url=URL.consultdel
+			ajax.data={cid:this.viewobj.cid};
+			ajax.send();
+		},
+		setAJAXDel: function(data){  //删除请示的返回处理
+			if (this.ajaxtype=='DELETE'){
+				this.setChk(4,'ok','请示信息已经成功删除');
+				setTimeout(function(){
+					vu.hideDialog('sure');
+					vu.hideDialog('viewop');
+					vu.getAJAXList();
+				},1500);
+			}else{
+				this.setChk(4,'ok','请示信息已经成功撤销');
+				this.list[this.reflist[this.viewobj.cid]].status=3;
+				setTimeout(function(){
+					vu.hideDialog('sure');
+					vu.getAJAXDetail();
+				},1500);
+			}
 		}
 	},
 	created:function(){
-		this.chk=this._getChkobj(4); //准备提示信息对象
-		//判定当前用户权限
+		this.chk=this._getChkobj(5);
 		if (this.me.tid==CFG.UD) this.isPublic=true;
 	},
 	watch:{ //输入项变更则取消错误提示信息
@@ -393,9 +603,6 @@ var vu=new Vue({
 		},
 		'answer.content':function(newVal){
 			if (this.chk[4].obj==='content') this.clearChk(4);
-		},
-		'answer.cause':function(newVal){
-			if (this.chk[4].obj==='cause') this.clearChk(4);
 		},
 		'real.keywords':function(newVal){
 			if (this.chk[1].obj=='keywords') this.clearChk(1);

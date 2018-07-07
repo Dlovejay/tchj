@@ -1,11 +1,13 @@
 @charset "utf-8";
 .nowStatus{ padding:3px 5px; border-radius:6px; font-weight:normal; border:1px solid #ccc;}
 .nowStatus.st0{ background-color:#fff3dc; border-color:#f90;}
-.nowStatus.st0:before{ content:'待接受'; color:#f90; font-weight:600;}
+.nowStatus.st0:before{ content:'待受理'; color:#f90; font-weight:600;}
 .nowStatus.st1{ background-color:#dae7ff; border-color:#3362b8;}
 .nowStatus.st1:before{ content:'处理中'; color:#3362b8;}
 .nowStatus.st2{ background-color:#1ba50c; border-color:#1ba50c;}
 .nowStatus.st2:before{ content:'已完成'; color:#fff;}
+.nowStatus.st3{ background-color:#b4b4b4; border:1px dashed #5a5a5a;}
+.nowStatus.st3:before{ content:'已撤销'; color:#333;}
 
 #viewOP .dialog-content,#taskop .dialog-content{ background-color:#eee;}
 .datafill{ background-color:#fff; padding-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,.2);}
@@ -19,4 +21,5 @@
 .buttonBar .tipMessage .loading{ border-color:#697ac1;}
 
 .lay2col.style1>*{ min-width:200px;}
+.lay2col.style2{ max-width:400px;}
 .txt.fa-clock-o{ color:red;}
