@@ -264,7 +264,7 @@ class TaskModel extends CI_Model
 
 
     public function canEdit($task, $user) {
-        if ($task['pid'] == $user['pid'] && in_array($task['status'], array(1,2))) {
+        if ($task['pid'] == $user['pid'] && in_array($task['status'], array(0,1))) {
             return true;
         } else {
             return false;

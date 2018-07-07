@@ -629,6 +629,9 @@ var vu=new Vue({
 			}
 			if (temp.list.length==0) this.setChk(3,'warning','暂无任何回复信息');
 			Vue.set(this.returnList,this.viewobj.mid,temp);
+			if (this.viewobj.status!=data.status){
+				this.list[this.reflist[this.viewobj.mid]].status=data.status;
+			}
 		},
 		getAJAXNext: function(){
 			var sd={

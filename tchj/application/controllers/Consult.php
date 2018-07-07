@@ -38,6 +38,7 @@ class Consult extends MY_Controller
         $status = $this->input->post('status');
 				$start_date = trim($this->input->post('start_date'));
         $end_date = trim($this->input->post('end_date'));
+				$keywords = trim($this->input->post('keywords'));
         $page = intval($this->input->post('page'));
         $page_size = intval($this->input->post('page_size'));
 
@@ -65,23 +66,30 @@ class Consult extends MY_Controller
         if(!empty($end_date) && strtotime($end_date)){
             $where .= ' AND c.create_date <= "' . $end_date . '"';
         }
+				if ($keywords!==''){
+					$where .=' AND title LIKE \'%'. $keywords .'%\'';
+				}
 
 
-        if(!empty($page)){
+        if(empty($page)){
             $page = 1;
         }
-        if(!empty($page_size)){
+        if(empty($page_size)){
             $page_size = 10;
         }
         $offset = ($page - 1) * $page_size;
         $field = 'c.*,u.username';
         $this->load->model('ConsultList');
         $result = $this->ConsultList->query($where, $field, $page_size, $offset);
-
+				$allcount=$this->ConsultList->query_total($where);
         $return = array(
             'code' => 0,
             'message' => '',
-            'data' => $result
+            'data' => array(
+							'total'=>$allcount,
+							'page'=>$page,
+							'list'=>$result
+						)
         );
 
         echo json_encode($return);
@@ -302,6 +310,19 @@ class Consult extends MY_Controller
             $this->db->where('id', $cid);
             $this->db->set('status', 3, FALSE);
             $this->db->update('consultlist');
+						$data = array(
+								'cid' => $cid,
+								'content' => '请示已被撤销',
+								'uid' => $user_info['uid'],
+								'retype' => 0
+						);
+						if ($this->db->insert('consultreturn', $data)){
+						}else{
+								$return['code']=500;
+								$return['message']='插入撤销信息错误，请管理员核查';
+								echo json_encode($return);
+								exit();
+						}
         }
 
         echo json_encode($return);
@@ -337,6 +358,7 @@ class Consult extends MY_Controller
             echo json_encode($return);
             exit();
         }
+				$nowstatus=$consult_info[0]['status'];
 
         # 如果是普通用户 则只能看到自己发布的请示
         if($user_info['tid'] == USERD && $consult_info[0]['uid'] != $user_info['uid']){
@@ -356,7 +378,10 @@ class Consult extends MY_Controller
         $offset = ($page - 1) * $page_size;
         $result = $this->ConsultList->query($where, '*', $page_size, $offset, 'consultreturn c');
 
-        $return['data'] = $result;
+        $return['data'] = array(
+					'list'=>$result,
+					'status'=>$nowstatus
+				);
 
         echo json_encode($return);
         exit();

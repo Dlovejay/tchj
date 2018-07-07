@@ -209,6 +209,7 @@
 							<li class="alone formpart table returnList">
 								<div class="captionTitle">
 									<span class="fa fa-comments-o"> 回复列表</span>
+									<button class="rexButton fa fa-refresh ss infor" title="刷新回复列表" v-bind:disabled="load.re" @click="getAJAXDetail()"></button>
 								</div>
 								<div v-for="item in returnList[viewobj.cid]" v-bind:class="item.classstr">
 									<span class="reuser"><strong>{{item.username}}</strong>{{item.create_date}}</span>

@@ -159,7 +159,8 @@ var vu=new Vue({
 			switch(txt){
 				case 'viewop':
 					this.viewobj=this.list[this.reflist[index]];
-					if (!this.returnList[this.viewobj.cid]) this.getAJAXDetail(); //获取反馈列表
+					console.log(this.returnList[this.viewobj.cid]);
+					if (!this.returnList[this.viewobj.cid] || this.returnList[this.viewobj.cid].length==0) this.getAJAXDetail(); //获取反馈列表
 					break;
 				case 'consultop':
 					if (this.viewobj!==''){
@@ -409,8 +410,8 @@ var vu=new Vue({
 			ajax.send();
 		},
 		setAJAXList: function(data){  //列表返回处理
-			//this.pager.page=data.pager.page;
-			this.pager.total=data.length;
+			this.pager.page=data.page;
+			this.pager.total=data.total;
 			this.pager.pagecount=Math.ceil(this.pager.total/this.pager.pagesize);
 			
 			this.list=[];
@@ -418,9 +419,9 @@ var vu=new Vue({
 			this.returnList={};
 			if (this.pager.total!==0){
 				this.reflist={};
-				for (var i=0; i<data.length; i++){
-					this.list.push(this._processList(data[i]));
-					this.reflist[data[i].id]=i;
+				for (var i=0; i<data.list.length; i++){
+					this.list.push(this._processList(data.list[i]));
+					this.reflist[data.list[i].id]=i;
 				}
 				if (this.viewobj){
 					this.viewobj=this.list[this.reflist[this.viewobj.cid]];
@@ -495,9 +496,9 @@ var vu=new Vue({
 			this.load.re=false;
 			this.clearChk(3);
 			var temp=[];
-			for (var i=0; i<data.length; i++){  //协调显示状态
+			for (var i=0; i<data.list.length; i++){  //协调显示状态
 				temp[i]={};
-				var returner=this.user[data[i]['uid']];
+				var returner=this.user[data.list[i]['uid']];
 				if (returner){
 					temp[i].username=returner.username;
 					if (returner.uid==this.viewobj.uid){
@@ -509,11 +510,15 @@ var vu=new Vue({
 					temp[i].username='unknow';
 					temp[i].classstr='anuser';
 				}
-				temp[i].create_date=data[i].create_date;
-				temp[i].content=data[i].content;
+				temp[i].create_date=data.list[i].create_date;
+				temp[i].content=data.list[i].content;
 			}
 			if (data.length==0) this.setChk(3,'warning','暂无任何回复信息');
 			Vue.set(this.returnList,this.viewobj.cid,temp);
+			//检查状态是否一致，不一致则修改
+			if (this.viewobj.status!=data.status){
+				this.list[this.reflist[this.viewobj.cid]].status=data.status;
+			}
 		},
 		doSure: function(){
 			switch(this.ajaxtype){

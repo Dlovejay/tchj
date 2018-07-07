@@ -16,7 +16,7 @@
 .nowStatus.st7:before{ content:'已撤销'; color:#333;}
 .timeoutStatus{ background-color:red; color:#fff; padding:3px 5px; border-radius:6px; font-weight:normal; border:1px solid red;}
 
-#viewOP .dialog-content,#taskop .dialog-content{ background-color:#eee;}
+#viewop .dialog-content,#taskop .dialog-content{ background-color:#eee;}
 .datafill{ background-color:#fff; padding-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,.2);}
 .buttonBar{ text-align:center; padding:10px;}
 .buttonBar .rexButton{ width:100px; margin:0 5px;}

@@ -12,6 +12,7 @@ var CFG={
 	pagesize: 20,  //分页数量
 };
 var URL={  //本站URL地址
+	login:'/index.php/login/',     //登录页面
 	loginin:'/index.php/login/loginin/',  //AJAX用户登录
 	loginout:'/index.php/loginout/',      //HTTP用户登出
 	home:'/index.php/home/',              //HTTP首页

@@ -29,15 +29,21 @@ h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; backgr
 .now{ color:#00A300;} 
 .now strong{ background-color:#00A300;}
 .now strong:before{  border:5px solid transparent; border-right-color:#00A300;}
-.remove{ color:#FF1724;}
-.remove strong{ background-color:#FF1724;}
-.remove strong:before{  border:5px solid transparent; border-right-color:#FF1724;}
+.remove{ color:#999;}
+.remove strong{ background-color:#999;}
+.remove strong:before{  border:5px solid transparent; border-right-color:#999;}
+.timeout{ color:#FF1724;}
+.timeout strong{ background-color:#FF1724;}
+.timeout strong:before{  border:5px solid transparent; border-right-color:#FF1724;}
 </style>
 </head>
 <body>
 	<div id="app" class="outFrame rexFrame nb nl header">
 		<div class="rexTopbar tCT">
 			<h2 class="bkStyle1"><span class="fa fa-bar-chart-o"></span> 工作概览</h2>
+			<span class="tools">
+				<button class="rexButton ss fa fa-lg fa-refresh warning" v-if="" @click="getAll()" title="刷新统计数据"></button>
+			</span>
 		</div>
 		<div class="rexRightpart">
 			<ul class="rexTab tCT" v-if="datalist.length>1">
@@ -54,7 +60,7 @@ h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; backgr
 						<div class="part">
 							<span class="all">任务总数 <strong class="rexTip">{{task[item.pid].total}}</strong></span>
 							<span class="now">进行中 <strong class="rexTip">{{task[item.pid].doing}}</strong></span>
-							<span class="remove">超时 <strong class="rexTip">{{task[item.pid].timeout}}</strong></span>
+							<span class="timeout">超时 <strong class="rexTip">{{task[item.pid].timeout}}</strong></span>
 							<span class="remove">已撤销 <strong class="rexTip">{{task[item.pid].repeal}}</strong></span>
 						</div>
 					</div>
@@ -204,6 +210,7 @@ var vu=new Vue({
 					return;
 				}
 			}
+			this.load=false;
 			this.ajaxtype='';
 			this.hideDialog('loading');
 		},
@@ -244,11 +251,12 @@ var vu=new Vue({
 				doing: first.doing,
 				repeal: first.repeal,
 				timeout: first.timeout,
-				first: first.first_finish_percent+'%',
-				reply: first.reply_percent+'%'
+				first: first.total-first.doing==0? '--':first.first_finish_percent+'%',
+				reply: first.doing==0? '--':first.reply_percent+'%'
 			};
 			for (var i=1; i<data.length; i++){
 				var temp2=data[i];
+				alert(temp2.count.total);
 				temp[temp2.pid]={
 					pid: temp2.pid,
 					pname: temp2.name,
@@ -256,8 +264,8 @@ var vu=new Vue({
 					doing: temp2.count.doing,
 					repeal: temp2.count.repeal,
 					timeout: temp2.count.timeout,
-					first: temp2.count.first_finish_percent+'%',
-					reply: temp2.count.reply_percent+'%'
+					first: temp2.count.total-temp2.count.doing==0? '--':temp2.count.first_finish_percent+'%',
+					reply: temp2.count.doing==0? '--':temp2.count.reply_percent+'%'
 				};
 			}
 			return temp;

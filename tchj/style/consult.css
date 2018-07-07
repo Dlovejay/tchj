@@ -9,7 +9,7 @@
 .nowStatus.st3{ background-color:#b4b4b4; border:1px dashed #5a5a5a;}
 .nowStatus.st3:before{ content:'已撤销'; color:#333;}
 
-#viewOP .dialog-content,#taskop .dialog-content{ background-color:#eee;}
+#viewop .dialog-content,#consultop .dialog-content{ background-color:#eee;}
 .datafill{ background-color:#fff; padding-bottom:10px; box-shadow:0 2px 5px rgba(0,0,0,.2);}
 .buttonBar{ text-align:center; padding:10px;}
 .buttonBar .rexButton{ width:100px; margin:0 5px;}

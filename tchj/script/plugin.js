@@ -1,4 +1,5 @@
 ;(function(){
+	var FRAMEURL='http://www.workday.com/index.php/notice/';
 	var whenReady = (function() {               //这个函数返回whenReady()函数
     var funcs = [];             //当获得事件时，要运行的函数
     var ready = false;          //当触发事件处理程序时,切换为true
@@ -57,7 +58,7 @@
 		setStyle(divObj,sty1);
 		divObj.appendChild(divHead);
 		divObj.appendChild(iframeObj);
-		iframeObj.src='http://www.workday.com/index.php/rextest2/';
+		iframeObj.src=FRAMEURL;
 		body.appendChild(divObj);
 		noticeObj=divBtn;
 		noticeObj.addEventListener('click',function(){

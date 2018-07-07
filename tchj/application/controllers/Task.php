@@ -64,6 +64,7 @@ class Task extends MY_Controller{
         }
 
         $this->TaskModel->toUnstartStatus($task);
+				$nowstatus=$task['status'];
         $data = $this->TaskModel->getOperation($task, $user);
         if (!$data["success"]) {
             rexAjaxReturn("403", "无权限查看");
@@ -72,7 +73,7 @@ class Task extends MY_Controller{
         $dos = $data["do"];
         $timeout = $this->TaskModel->isTimeout($task);
         $canEdit = $this->TaskModel->canEdit($task, $user);
-        rexAjaxReturn(0, "",  array("replys" => json_decode($task["replys"], true), "is_timeout" => $timeout, "do" => $dos, 'canEdit' => $canEdit));
+        rexAjaxReturn(0, "",  array("replys" => json_decode($task["replys"], true), "is_timeout" => $timeout, "do" => $dos, 'canEdit' => $canEdit, 'status'=>$nowstatus));
     }
 
 
