@@ -130,7 +130,7 @@ td .fa-user:before{ font-size:1.2em; color:#4569DD; margin-right:3px; vertical-a
 					<div class="tipMessage" v-if="chk[0].flag">
 						<span class="fa" v-bind:class="chk[0].flag"> {{chk[0].msg}}</span>
 					</div>
-					<button class="rexButton infor" @click="sendData()">提&emsp;交</button>
+					<button class="rexButton infor" @click="sendData()" v-bind:disabled="load">提&emsp;交</button>
 				</div>
 			</div>
 		</div>

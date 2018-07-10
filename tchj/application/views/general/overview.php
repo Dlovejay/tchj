@@ -256,7 +256,6 @@ var vu=new Vue({
 			};
 			for (var i=1; i<data.length; i++){
 				var temp2=data[i];
-				alert(temp2.count.total);
 				temp[temp2.pid]={
 					pid: temp2.pid,
 					pname: temp2.name,

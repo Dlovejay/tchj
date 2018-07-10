@@ -98,7 +98,25 @@ class Base extends CI_Model {
 					$return['message']='该部门下已经存在用户信息，请确保要操作的部门无对应用户信息后再删除';
 					return $return;
 				};
-				//检查当前任务权限已经含有当前部门，有则目前也不能删除
+				//检查当前请示信息是否包含该部门
+				$this->db->select('id');
+				$this->db->where('pid',$arr['pid']);
+				$this->db->from('consultlist');
+				if ($this->db->count_all_results()>0){
+					$return['code']=401;
+					$return['message']='请示信息中已经包含该部门，无法删除，否则请联系工程师';
+					return $return;
+				};
+				//检查当前任务信息是否包含该部门
+				$this->db->select('pid');
+				$this->db->where('pid',$arr['pid']);
+				$this->db->from('task_department_relation');
+				if ($this->db->count_all_results()>0){
+					$return['code']=401;
+					$return['message']='任务信息中已包含该部门，无法删除，否则请联系工程师';
+					return $return;
+				};
+				
 				$this->db->where('pid',$arr['pid']);
 				$query=$this->db->delete('department');
 				if (!$query){

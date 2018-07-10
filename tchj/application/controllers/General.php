@@ -116,14 +116,14 @@ class General extends MY_Controller{
 	public function userdrop(){  //删除用户
 		$result=parent::checkPower([USERM]);
 		if ($result['code']){
-			rexAjaxReturn(403,'当前用户非管理员，无法添加用户');
+			rexAjaxReturn(403,'当前用户非管理员，无法删除用户');
 			return;
 		}
 		$indata=array(
 			'uid'=>$this->input->post('uid')
 		);
 		if ($indata['uid']==$_SESSION['user']['uid']){
-			rexAjaxReturn(401,'无法删除当前登录的用户');
+			rexAjaxReturn(401,'无法删除自己');
 			return;
 		}
 		$this->load->model('User');

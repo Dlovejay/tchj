@@ -184,7 +184,33 @@ class User extends CI_Model{
 			$return['message']='管理员无法删除';
 			return $return;
 		}
-		//是否有业务数据的判定
+		//是否发布过请示或者回复过请示
+		$this->db->select('id');
+		$this->db->where('act_user',$arr['uid']);
+		$query=$this->db->get('consultlist');
+		if ($query->num_rows()!=0){
+			$return['code']=401;
+			$return['message']='当前用户已发布过请示信息，无法删除，否则请联系工程师';
+			return $return;
+		}
+		$this->db->select('id');
+		$this->db->where('uid',$arr['uid']);
+		$query=$this->db->get('consultreturn');
+		if ($query->num_rows()!=0){
+			$return['code']=401;
+			$return['message']='当前用户已回复过请示信息，无法删除，否则请联系工程师';
+			return $return;
+		}
+		//是否发布过任务或者回复过任务
+		$this->db->select('mid');
+		$this->db->where('create_user_id',$arr['uid']);
+		$this->db->or_where('last_do_user_id',$arr['uid']);
+		$query=$this->db->get('task');
+		if ($query->num_rows()!=0){
+			$return['code']=401;
+			$return['message']='当前用户已发布或者回复过任务信息，无法删除，否则请联系工程师';
+			return $return;
+		}		
 		
 		$this->db->delete('user', array('uid'=>$arr['uid']));
 		return $return;
