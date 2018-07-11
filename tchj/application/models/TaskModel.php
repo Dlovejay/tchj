@@ -346,7 +346,7 @@ class TaskModel extends CI_Model
                 $data[] = array('pid' => $d['pid'], 'name' => $d['pname'], 'count' => $this->count($result, $d['pid']));
             }
         } else if ( $user['tid'] == 3 ) {
-            $data[] = array('pid' => 0, 'name' => '总计', 'count' => $this->count($result, $user['pid']));
+            $data[] = array('pid' => $user['pid'], 'name' => '总计', 'count' => $this->count($result, $user['pid']));
             $CI =& get_instance();
             $CI->load->model('Department');
             $departments = $CI->Department->getListByLevels(array(2));
