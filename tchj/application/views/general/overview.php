@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="UTF-8">
-	<title>太仓海警支队--概览页面</title>
+	<title>江苏海警支队--概览页面</title>
 	<link rel="stylesheet" href="/style/fontawesome/font-awesome.css"/>
 	<link rel="stylesheet" href="/style/publicStyle5.1.css"/>
 <style type="text/css">
@@ -252,7 +252,7 @@ var vu=new Vue({
 				repeal: first.repeal,
 				timeout: first.timeout,
 				first: first.total-first.doing==0? '--':first.first_finish_percent+'%',
-				reply: first.doing==0? '--':first.reply_percent+'%'
+				reply: first.total-first.repeal==0? '--':first.reply_percent+'%'
 			};
 			for (var i=1; i<data.length; i++){
 				var temp2=data[i];
@@ -264,7 +264,7 @@ var vu=new Vue({
 					repeal: temp2.count.repeal,
 					timeout: temp2.count.timeout,
 					first: temp2.count.total-temp2.count.doing==0? '--':temp2.count.first_finish_percent+'%',
-					reply: temp2.count.doing==0? '--':temp2.count.reply_percent+'%'
+					reply: temp2.count.total-temp2.count.repeal==0? '--':temp2.count.reply_percent+'%'
 				};
 			}
 			return temp;

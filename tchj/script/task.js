@@ -88,6 +88,21 @@ var vu=new Vue({
 			}
 			return tempArray;
 		},
+		getButtonTxt: function(){
+			if (!this.returnList[this.viewobj.mid]) return '';
+			if (this.returnList[this.viewobj.mid].status.indexOf('REPLY')>=0) return '提交任务';
+			if (this.returnList[this.viewobj.mid].status.indexOf('FINISHED')>=0) return '评审任务';
+		},
+		getButtonTxt2: function(){
+			if (!this.returnList[this.viewobj.mid]) return '';
+			if (this.returnList[this.viewobj.mid].status.indexOf('REPLY')>=0) return '确定提交';
+			if (this.returnList[this.viewobj.mid].status.indexOf('FINISHED')>=0) return '提交评审';
+		},
+		getLabelTxt: function(){
+			if (!this.returnList[this.viewobj.mid]) return '';
+			if (this.returnList[this.viewobj.mid].status.indexOf('REPLY')>=0) return '任务简结';
+			if (this.returnList[this.viewobj.mid].status.indexOf('FINISHED')>=0) return '评审概要';
+		},
 		canDo: function(){  //回复/修改操作是否可进行的基本判定
 			if (this.load.re) return false;
 			if (!this.viewobj) return false;

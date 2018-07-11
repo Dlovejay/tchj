@@ -390,8 +390,9 @@ class TaskModel extends CI_Model
         }
         //var_dump($count);exit;
         $count['first_finish_percent'] = $count['finish'] == 0?0:round($count['first_finish']/$count['finish']*100, 1);
-        $count['reply_percent'] = $count['doing'] == 0?0:round($count['reply']/$count['doing']*100, 1);
-        unset($count['first_finish']);
+        //$count['reply_percent'] = $count['doing'] == 0?0:round($count['reply']/$count['doing']*100, 1);
+        $count['reply_percent'] = $count['total']-$count['repeal'] == 0?0:round($count['finish']/($count['total']-$count['repeal'])*100, 1);
+				unset($count['first_finish']);
         unset($count['reply']);
         unset($count['finish']);
         return $count;

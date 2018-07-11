@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="UTF-8">
-	<title>太仓海警支队--请示列表</title>
+	<title>江苏海警支队--请示列表</title>
 	<link rel="stylesheet" href="/style/fontawesome/font-awesome.css"/>
 	<link rel="stylesheet" href="/style/publicStyle5.2.css"/>
 	<link rel="stylesheet" href="/style/consult.css"/>
@@ -270,11 +270,11 @@
 							<label class="rexLabel">标记请示</label><span>
 								<span class="rexCheck" style="margin-right:10px">
 									<input type="radio" name="returntype" value="1" v-model="answer.complete"/>
-									<label>已通过</label>
+									<label>已批复</label>
 								</span>
 								<span class="rexCheck">
 									<input type="radio" name="returntype" value="0" v-model="answer.complete"/>
-									<label>暂未完成</label>
+									<label>暂未批复</label>
 								</span>
 							</span>
 						</li>

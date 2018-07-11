@@ -47,9 +47,11 @@ class Consult extends MY_Controller
         # 还需要看用户是什么级别,如果不是领导 那就只能看自己发布的请示
         if($user_info['tid'] == USERD){
             $where = ' c.created_pid = ' . $user_info['pid'];
-        }else{
+        }else if($user_info['tid'] == USERU){
             $where = ' c.pid = ' . $user_info['pid'];
-        }
+        }else{
+						$where = ' 1=1';
+				}
 
         if(!empty($create_uid)){
             $where .= ' AND c.uid = ' . $create_uid;

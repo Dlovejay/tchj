@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="UTF-8">
-	<title>太仓海警支队--任务列表</title>
+	<title>江苏海警支队--任务列表</title>
 	<link rel="stylesheet" href="/style/fontawesome/font-awesome.css"/>
 	<link rel="stylesheet" href="/style/publicStyle5.2.css"/>
 	<link rel="stylesheet" href="/style/task.css"/>
@@ -222,7 +222,7 @@
 								<label class="rexLabel">截止日期</label><span>{{viewobj.end_at}}</span>
 							</li>
 							<li class="alone formpart view">
-								<label class="rexLabel">任务说明</label><span>{{viewobj.content}}</span>
+								<label class="rexLabel">任务说明</label><span v-html="viewobj.content"></span>
 							</li>
 							<li class="alone formpart view">
 								<label class="rexLabel">指派部门</label><span>{{viewobj.department}}</span>
@@ -260,7 +260,7 @@
 					</div>
 					<div class="buttonBar" v-if="me.tid!=CFG.UM">
 						<button class="rexButton infor" @click="showDialog('sure','RECEIVE')" v-if="canDo && canReceive">接受任务</button>
-						<button class="rexButton infor" @click="showDialog('answer')" v-if="canDo && canReply">我要回复</button>
+						<button class="rexButton infor" @click="showDialog('answer')" v-if="canDo && canReply">{{getButtonTxt}}</button>
 						<button class="rexButton alert" @click="showDialog('sure','DELETE')" v-if="canDo && canDelete">删除任务</button>
 						<button class="rexButton alert" @click="showDialog('sure','REPEAL')" v-if="canDo && canRepeal">撤销任务</button>
 					</div>
@@ -294,11 +294,11 @@
 			<div class="dialogFrame">
 				<div class="dialog-title">
 					<span class="opBnt right fa fa-lg fa-times" @click="hideDialog('answer')" v-if="!load.re"></span>
-					<h4 class="t3"><span class="fa fa-comment-o"></span>&emsp;<span class="diy">任务进度回复</span></h4>
+					<h4 class="t3"><span class="fa fa-comment-o"></span>&emsp;<span class="diy">{{getButtonTxt}}</span></h4>
 				</div>
 				<div class="dialog-buttonBar">
 					<div class="bntInside">
-						<button class="rexButton opBnt infor" @click="getAJAXNext()" v-bind:disabled="load.re"> 提交回复</button>
+						<button class="rexButton opBnt infor" @click="getAJAXNext()" v-bind:disabled="load.re">{{getButtonTxt2}}</button>
 					</div>
 				</div>
 				<div class="dialog-content">
@@ -316,7 +316,7 @@
 							</span>
 						</li>
 						<li class="formpart alone">
-							<label class="rexLabel">回复内容</label><span class="request">
+							<label class="rexLabel">{{getLabelTxt}}</label><span class="request">
 								<textarea class="rexTxtarea" v-model.trim="answer.content" v-bind:class="{'warning':chk[4].obj=='content'}"></textarea>
 							</span>
 						</li>

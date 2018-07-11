@@ -61,7 +61,7 @@ class General extends MY_Controller{
 				return;
 			}
 		}
-		if ($indata['tid']<USERU){
+		if ($indata['tid']<USERL){
 			$indata['pid']=0;
 		}else{
 			if (empty($indata['pid'])){

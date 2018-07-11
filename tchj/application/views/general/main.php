@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="UTF-8">
-	<title>太仓海警支队--管理系统主页</title>
+	<title>江苏海警支队--管理系统主页</title>
 	<link rel="stylesheet" href="/style/fontawesome/font-awesome.css"/>
 	<link rel="stylesheet" href="/style/publicStyle5.2.css"/>
 	<link rel="stylesheet" href="/style/main.css"/>
@@ -12,7 +12,7 @@
 <div id="app" class="outFrame rexFrame nb">
   <div class="rexTopbar">
     <img src="/style/images/logo.png"/>
-		<h1 class="c0F">太仓海警支队内部任务管理系统 <span class="ver"></span></h1>
+		<h1 class="c0F">江苏海警支队双向任务管理系统 <span class="ver"></span></h1>
 		<div class="userInfor">
 			<div class="staticPart fa fa-caret-down">
 				<span class="fa fa-user face"></span>

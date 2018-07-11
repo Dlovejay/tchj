@@ -33,7 +33,7 @@ var vu=new Vue({
 		filterDPMT: function(){
 			if (this.op=='edit') return [];
 			var tempArray=[];
-			if (this.edit.tid==this.cfg.UD || this.edit.tid==this.cfg.UU){
+			if (this.edit.tid==this.cfg.UL || this.edit.tid==this.cfg.UD || this.edit.tid==this.cfg.UU){
 				for (var x in this.department){
 					if (this.department[x].plevel==this.usertype[this.edit.tid].plevel){
 						tempArray.push(this.department[x]);
