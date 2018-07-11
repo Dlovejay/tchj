@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="UTF-8">
-	<title>太仓海警支队--用户登录</title>
+	<title>江苏海警支队--用户登录</title>
 	<link rel="stylesheet" href="/style/fontawesome/font-awesome.css"/>
 	<link rel="stylesheet" href="/style/publicStyle5.2.css"/>
 	<link rel="stylesheet" href="/style/login.css"/>
@@ -11,8 +11,8 @@
 <body>
 	<div id="app" class="outFrame bkStyle1">
 		<div class="titles">
-			<h1>太仓海警支队</h1>  
-			<h2>内部任务管理系统 <span class="ver">{{ver}}</span></h2>
+			<h1>江苏海警支队</h1>  
+			<h2>双向任务管理系统 <span class="ver">{{ver}}</span></h2>
 		</div>
 		<div class="content">
 			<div class="loginForm t3">

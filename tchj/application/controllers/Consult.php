@@ -8,7 +8,7 @@ class Consult extends MY_Controller
     public function index()
     {
 
-        $data = array(
+        /*$data = array(
             'base_url' => $this->config->item('base_url')
         );
 
@@ -17,59 +17,81 @@ class Consult extends MY_Controller
         $where = ['plevel' => 1];
         $departments = $this->db->where($where)->select('pid, pname')->get('department', 0, 0);
         $data['departments'] = $departments->result_array();
-
+				*/
+				$this->load->model('User');
+        $result=$this->User->user();
+        $data['user']=$result['data'];
+        $data['account']=$_SESSION['user'];
+        $this->load->model('Base');
+        $result=$this->Base->department();
+        $data['department']=$result['data'];
         # 部门,用户数据
-        $this->load->view('consult/index.php',$data);
+        //$this->load->view('consult/index.php',$data);
+				$this->load->view('consult/consultlist.php',$data);
     }
 
     # 请示列表
     public function consult_list()
     {
-        $create_uid = intval($this->input->get('create_uid'));
-        $status = intval($this->input->get('status'));
-        $start_date = trim($this->input->get('start_date'));
-        $end_date = trim($this->input->get('end_date'));
-        $page = intval($this->input->get('page'));
-        $page_size = intval($this->input->get('page_size'));
+        $create_uid = intval($this->input->post('create_uid'));
+        //$status = intval($this->input->post('status'));
+        $status = $this->input->post('status');
+				$start_date = trim($this->input->post('start_date'));
+        $end_date = trim($this->input->post('end_date'));
+				$keywords = trim($this->input->post('keywords'));
+        $page = intval($this->input->post('page'));
+        $page_size = intval($this->input->post('page_size'));
 
         $user_info = $this->session->userdata('user');
         # 就不做校验了  对于不合法的数据 当成没有这个条件
         # 还需要看用户是什么级别,如果不是领导 那就只能看自己发布的请示
         if($user_info['tid'] == USERD){
             $where = ' c.created_pid = ' . $user_info['pid'];
-        }else{
+        }else if($user_info['tid'] == USERU){
             $where = ' c.pid = ' . $user_info['pid'];
-        }
+        }else{
+						$where = ' 1=1';
+				}
 
         if(!empty($create_uid)){
             $where .= ' AND c.uid = ' . $create_uid;
         }
-        if(!empty($status)){
-            $where .= ' AND c.check_status = ' . $status;
-        }
+        //if(!empty($status)){
+				if ($status!==''){
+					$status=intval($status);
+            //$where .= ' AND c.check_status = ' . $status;
+					$where .= ' AND c.status = ' . $status;
+				}
         if(!empty($start_date) && strtotime($start_date)){
             $where .= ' AND c.create_date >= "' . $start_date . '"';
         }
         if(!empty($end_date) && strtotime($end_date)){
             $where .= ' AND c.create_date <= "' . $end_date . '"';
         }
+				if ($keywords!==''){
+					$where .=' AND title LIKE \'%'. $keywords .'%\'';
+				}
 
 
-        if(!empty($page)){
+        if(empty($page)){
             $page = 1;
         }
-        if(!empty($page_size)){
+        if(empty($page_size)){
             $page_size = 10;
         }
         $offset = ($page - 1) * $page_size;
-        $field = '*';
+        $field = 'c.*,u.username';
         $this->load->model('ConsultList');
         $result = $this->ConsultList->query($where, $field, $page_size, $offset);
-
+				$allcount=$this->ConsultList->query_total($where);
         $return = array(
             'code' => 0,
             'message' => '',
-            'data' => $result
+            'data' => array(
+							'total'=>$allcount,
+							'page'=>$page,
+							'list'=>$result
+						)
         );
 
         echo json_encode($return);
@@ -224,7 +246,7 @@ class Consult extends MY_Controller
         $data = array(
             'cid' => $cid,
             'content' => $content,
-            'return_user_id' => $user_info['uid'],
+            'uid' => $user_info['uid'],
             'retype' => 0
         );
 
@@ -248,6 +270,7 @@ class Consult extends MY_Controller
             $this->db->set('act_user', $act_user, false);
             $this->db->update('consultlist');
         }else{
+						die($this->db->last_query());
             $return['code'] = 401;
             $return['message'] = '发表请示失败,请重试';
         }
@@ -289,6 +312,19 @@ class Consult extends MY_Controller
             $this->db->where('id', $cid);
             $this->db->set('status', 3, FALSE);
             $this->db->update('consultlist');
+						$data = array(
+								'cid' => $cid,
+								'content' => '请示已被撤销',
+								'uid' => $user_info['uid'],
+								'retype' => 0
+						);
+						if ($this->db->insert('consultreturn', $data)){
+						}else{
+								$return['code']=500;
+								$return['message']='插入撤销信息错误，请管理员核查';
+								echo json_encode($return);
+								exit();
+						}
         }
 
         echo json_encode($return);
@@ -298,9 +334,9 @@ class Consult extends MY_Controller
     # 请示回复列表
     public function consult_replies()
     {
-        $cid = intval($this->input->get('cid'));
-        $page = intval($this->input->get('page'));
-        $page_size = intval($this->input->get('page_size'));
+        $cid = intval($this->input->post('cid'));
+        $page = intval($this->input->post('page'));
+        $page_size = intval($this->input->post('page_size'));
         $user_info = $this->session->userdata('user');
 
         $return = rexGetMReturn();
@@ -324,6 +360,7 @@ class Consult extends MY_Controller
             echo json_encode($return);
             exit();
         }
+				$nowstatus=$consult_info[0]['status'];
 
         # 如果是普通用户 则只能看到自己发布的请示
         if($user_info['tid'] == USERD && $consult_info[0]['uid'] != $user_info['uid']){
@@ -343,7 +380,10 @@ class Consult extends MY_Controller
         $offset = ($page - 1) * $page_size;
         $result = $this->ConsultList->query($where, '*', $page_size, $offset, 'consultreturn c');
 
-        $return['data'] = $result;
+        $return['data'] = array(
+					'list'=>$result,
+					'status'=>$nowstatus
+				);
 
         echo json_encode($return);
         exit();

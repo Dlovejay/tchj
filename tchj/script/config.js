@@ -12,6 +12,7 @@ var CFG={
 	pagesize: 20,  //分页数量
 };
 var URL={  //本站URL地址
+	login:'/index.php/login/',     //登录页面
 	loginin:'/index.php/login/loginin/',  //AJAX用户登录
 	loginout:'/index.php/loginout/',      //HTTP用户登出
 	home:'/index.php/home/',              //HTTP首页
@@ -27,17 +28,22 @@ var URL={  //本站URL地址
 	jobadd:'/index.php/general/jobadd', //AJAX职务添加
 	jobedit:'/index.php/general/jobedit', //AJAX职务修改
 	jobdrop:'/index.php/general/jobdrop', //AJAX职务删除
-	overview:'/rextest/overview',
+	overview:'/index.php/general/overview',  //概览
+	taskover:'/index.php/task/statistics',  //任务统计
 	task:'/index.php/task/',   //HTTP任务列表页面
 	tasklist:'/index.php/task/lists', //AJAX任务列表
 	taskadd:'/index.php/task/add',    //AJAX任务添加
 	taskdetail:'/index.php/task/detail', //AJAX获得任务回复列表
 	tasknext:'/index.php/task/next',  //AJAX回复任务
-	taskedit:'',
-	consult:'/index.php/consulttest/',
-	consultlist:'/index.php/consulttest/consult_list',
-	consultadd:'/index.php/consulttest/add_consult',
-	consultreply:'/index.php/consulttest/consult_replies'
+	taskedit:'/index.php/task/edit',  //AJAX任务编辑
+	consult:'/index.php/consult/',
+	consultlist:'/index.php/consult/consult_list', //请示列表
+	consultadd:'/index.php/consult/add_consult',   //添加请示
+	consultreply:'/index.php/consult/consult_replies',  //回复列表
+	consultanswer:'/index.php/consult/replies_consult',  //请示回复
+	consultdel:'/index.php/consult/del_consult',   //删除请示
+	consulteidt:'/index.php/consult/edit_consult', //请示修改
+	consultover:'/index.php/consult/consult_statistics' //请示概览
 };
 //正则字典
 var REG={

@@ -61,7 +61,7 @@ class General extends MY_Controller{
 				return;
 			}
 		}
-		if ($indata['tid']<USERU){
+		if ($indata['tid']<USERL){
 			$indata['pid']=0;
 		}else{
 			if (empty($indata['pid'])){
@@ -116,14 +116,14 @@ class General extends MY_Controller{
 	public function userdrop(){  //删除用户
 		$result=parent::checkPower([USERM]);
 		if ($result['code']){
-			rexAjaxReturn(403,'当前用户非管理员，无法添加用户');
+			rexAjaxReturn(403,'当前用户非管理员，无法删除用户');
 			return;
 		}
 		$indata=array(
 			'uid'=>$this->input->post('uid')
 		);
 		if ($indata['uid']==$_SESSION['user']['uid']){
-			rexAjaxReturn(401,'无法删除当前登录的用户');
+			rexAjaxReturn(401,'无法删除自己');
 			return;
 		}
 		$this->load->model('User');
@@ -292,5 +292,9 @@ class General extends MY_Controller{
 		$this->load->model('Base');
 		$result=$this->Base->jobOP('drop',$indata);
 		rexAjaxReturn($result);
+	}
+	
+	public function overview(){  //概览
+		$this->load->view('general/overview.php');
 	}
 }

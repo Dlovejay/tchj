@@ -118,7 +118,7 @@ class TaskModel extends CI_Model
 
 
     public function getPageResult($user, $params) {
-        $field = array('t.mid', 't.title', 't.content', 't.start_at', 't.end_at', 't.create_at', 't.update_at', 't.create_user_id', 't.last_do_user_id', 't.count', 't.status', 't.annex', 't.is_timeout', 't.departments','t.initiate_pid');
+        $field = array('t.mid', 't.title', 't.content', 't.start_at', 't.end_at', 't.create_at', 't.update_at', 't.create_user_id', 't.last_do_user_id', 't.count', 't.status', 't.annex', 't.is_timeout', 't.departments','t.initiate_pid','t.cause');
         $mysqlParams = $this->getJoinWhere($user, $params);
         $countSql = " SELECT COUNT(*) AS total FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"];
         $sql = " SELECT " . implode(",", $field) . " FROM " . $mysqlParams["join"] . " WHERE " . $mysqlParams["where"] . " ORDER BY t.update_at DESC ";
@@ -264,7 +264,7 @@ class TaskModel extends CI_Model
 
 
     public function canEdit($task, $user) {
-        if ($task['pid'] == $user['pid'] && in_array($task['status'], array(1,2))) {
+        if ($task['pid'] == $user['pid'] && in_array($task['status'], array(0,1))) {
             return true;
         } else {
             return false;
@@ -406,8 +406,9 @@ class TaskModel extends CI_Model
         }
         //var_dump($count);exit;
         $count['first_finish_percent'] = $count['finish'] == 0?0:round($count['first_finish']/$count['finish']*100, 1);
-        $count['reply_percent'] = $count['doing'] == 0?0:round($count['reply']/$count['doing']*100, 1);
-        unset($count['first_finish']);
+        //$count['reply_percent'] = $count['doing'] == 0?0:round($count['reply']/$count['doing']*100, 1);
+        $count['reply_percent'] = $count['total']-$count['repeal'] == 0?0:round($count['finish']/($count['total']-$count['repeal'])*100, 1);
+				unset($count['first_finish']);
         unset($count['reply']);
         unset($count['finish']);
         return $count;

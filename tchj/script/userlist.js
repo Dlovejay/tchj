@@ -33,7 +33,7 @@ var vu=new Vue({
 		filterDPMT: function(){
 			if (this.op=='edit') return [];
 			var tempArray=[];
-			if (this.edit.tid==this.cfg.UD || this.edit.tid==this.cfg.UU){
+			if (this.edit.tid==this.cfg.UL || this.edit.tid==this.cfg.UD || this.edit.tid==this.cfg.UU){
 				for (var x in this.department){
 					if (this.department[x].plevel==this.usertype[this.edit.tid].plevel){
 						tempArray.push(this.department[x]);
@@ -122,6 +122,7 @@ var vu=new Vue({
 				this.op='';
 				this.edit.uid='';
 			}
+			this.clearChk(0);
 			dialog.close(name);
 		},
 		//初始化edit的用户数据
@@ -133,6 +134,9 @@ var vu=new Vue({
 			this.edit.jname=temp.jname;
 			this.edit.realname=temp.realname;
 			this.edit.telnumber=temp.telnumber;
+			this.edit.oldpassword='';
+			this.edit.newpassword='';
+			this.edit.repassword='';
 		},
 		//检查数据完整性
 		checkData: function(){

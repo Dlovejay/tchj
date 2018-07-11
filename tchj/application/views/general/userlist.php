@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="UTF-8">
-	<title>太仓海警支队--用户管理</title>
+	<title>江苏海警支队--用户管理</title>
 	<link rel="stylesheet" href="/style/fontawesome/font-awesome.css"/>
 	<link rel="stylesheet" href="/style/publicStyle5.2.css"/>
 <style type="text/css">
@@ -130,7 +130,7 @@ td .fa-user:before{ font-size:1.2em; color:#4569DD; margin-right:3px; vertical-a
 					<div class="tipMessage" v-if="chk[0].flag">
 						<span class="fa" v-bind:class="chk[0].flag"> {{chk[0].msg}}</span>
 					</div>
-					<button class="rexButton infor" @click="sendData()">提&emsp;交</button>
+					<button class="rexButton infor" @click="sendData()" v-bind:disabled="load">提&emsp;交</button>
 				</div>
 			</div>
 		</div>
