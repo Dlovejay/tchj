@@ -23,14 +23,16 @@ var vu=new Vue({
 			is_timeout:'',
 			keywords:'',
 			start_at:'',
-			end_at:''
+			end_at:'',
+			departmentID:''
 		},
 		realbak:{  //查询条件
 			status:'',
 			is_timeout:'',
 			keywords:'',
 			start_at:'',
-			end_at:''
+			end_at:'',
+			departmentID:''
 		},
 		edit:{
 			mid:'',
@@ -63,6 +65,24 @@ var vu=new Vue({
 		viewobj:''   //当前查看任务的对应对象
 	},
 	computed:{
+		//准备部门下拉框内容
+		filterDPMT: function(){
+			var tempArray=[];
+			var chkLevel;
+			if (this.me.tid==this.cfg.UM || this.me.tid==this.cfg.UL){
+				chkLevel=['1','2'];
+			}else if(this.me.tid==this.cfg.UU){
+				chkLevel=['2'];
+			}else{
+				chkLevel=[];
+			}
+			for (var x in this.department){
+				if (chkLevel.indexOf(this.department[x].plevel)>=0){
+					tempArray.push(this.department[x]);
+				}
+			}
+			return tempArray;
+		},
 		getDispatchDepartment: function(){ //获得可用于指派部门可选项
 			var tempArray=[];
 			var check;
@@ -100,7 +120,7 @@ var vu=new Vue({
 		},
 		getLabelTxt: function(){
 			if (!this.returnList[this.viewobj.mid]) return '';
-			if (this.returnList[this.viewobj.mid].status.indexOf('REPLY')>=0) return '任务简结';
+			if (this.returnList[this.viewobj.mid].status.indexOf('REPLY')>=0) return '任务备注';
 			if (this.returnList[this.viewobj.mid].status.indexOf('FINISHED')>=0) return '评审概要';
 		},
 		canDo: function(){  //回复/修改操作是否可进行的基本判定
@@ -498,7 +518,8 @@ var vu=new Vue({
 				status: this.realbak.status,
 				is_timeout: this.realbak.is_timeout,
 				page: this.pager.page,
-				pagesize: this.pager.pagesize
+				pagesize: this.pager.pagesize,
+				departmentID: this.realbak.departmentID
 			},
 			ajax.url=URL.tasklist;
 			ajax.send();

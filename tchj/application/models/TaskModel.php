@@ -106,6 +106,10 @@ class TaskModel extends CI_Model
                 $where = $where . " AND !(t.is_timeout=1 OR (t.status=1 AND t.end_at<{$time}))";
             }
         }
+				if (!empty($params["departmentID"])){
+					$where = $where . " AND departments=?";
+					$param[] = "{$params["departmentID"]}";
+				}
 
         if (!empty($params["keywords"])) {
             $where = $where . " AND title LIKE ?";
@@ -162,24 +166,30 @@ class TaskModel extends CI_Model
 
     public function Add($fieldParams) {
         $departments = $fieldParams["departments"];
-        $time = time();
-        $fieldParams["last_do_user_id"] = $fieldParams["create_user_id"];
-        $fieldParams["create_at"] = $time;
-        $fieldParams['update_at'] = $time;
-        $fieldParams["replys"] = "[]";
-        $fieldParams["annex"] = json_encode($fieldParams["annex"]);
-        $fieldParams["departments"] = implode(",", $fieldParams["departments"]);
+				$this->db->trans_start();
+				$tempID=array();
+				for ($i=0; $i<count($departments); $i++){
+					$time = time();
+					$fieldParams["last_do_user_id"] = $fieldParams["create_user_id"];
+					$fieldParams["create_at"] = $time;
+					$fieldParams['update_at'] = $time;
+					$fieldParams["replys"] = "[]";
+					$fieldParams["annex"] = json_encode($fieldParams["annex"]);
+					//$fieldParams["departments"] = implode(",", $fieldParams["departments"]);
+					$fieldParams["departments"]=$departments[$i];
 
-        $this->db->trans_start();
-        $sql = $this->db->set($fieldParams)->get_compiled_insert('task');
-        $this->db->query($sql);
-        $id = $this->db->insert_id();
-        foreach($departments as $pid) {
-            $ra = array("mid" => $id, "pid" => $pid);
-            $this->db->insert('task_department_relation' , $ra);
+					//$this->db->trans_start();
+					$sql = $this->db->set($fieldParams)->get_compiled_insert('task');
+					$this->db->query($sql);
+					$id = $this->db->insert_id();
+					$tempID[]=$id;
+        //foreach($departments as $pid) {
+            //$ra = array("mid" => $id, "pid" => $pid);
+					$ra = array("mid" => $id, "pid" => $departments[$i]);
+          $this->db->insert('task_department_relation' , $ra);
         }
         $this->db->trans_complete();
-        return $id;
+        return $tempID;
     }
 
 

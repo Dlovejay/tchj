@@ -10,6 +10,8 @@
 .outFrame{ background-color:#fff;}
 .rexTab{ background-color:#eee;}
 .overview{ width:70%; min-width:340px; max-width:500px; margin:10px auto 40px auto;}
+.itemview{ width:70%; min-width:500px; max-width:800px; margin:10px auto 40px auto;}
+.itemview table{ margin-bottom:20px;}
 .inside{ background-color:#eee; border-radius:6px; margin-top:10px; padding-bottom:15px; padding-top:10px; position:relative; top:-15px; border:1px solid #ccc;}
 h3{ color:#7278ad; position:relative; z-index:10;}
 h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; background-color:#7278ad; vertical-align:middle; color:#fff; text-align:center; line-height:40px; overflow:hidden; font-size:24px; margin-right:10px;}
@@ -46,35 +48,76 @@ h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; backgr
 			</span>
 		</div>
 		<div class="rexRightpart">
-			<ul class="rexTab tCT" v-if="datalist.length>1">
-				<li class="rexItem" v-for="(item,index) in datalist" v-bind:class="{'sel':viewindex==index}" @click="changeView(index)">{{item.pname}}</li>
+			<ul class="rexTab tCT">
+				<li class="rexItem" v-bind:class="{'sel':viewindex==0}" @click="changeView(0)" v-if="task[2].length>0 || consult[2].length>0">总计</li>
+				<li class="rexItem" v-bind:class="{'sel':viewindex==1}" @click="changeView(1)" v-if="task[1].length>0 || consult[1].length>0">上级部门</li>
+				<li class="rexItem" v-bind:class="{'sel':viewindex==2}" @click="changeView(2)" v-if="task[2].length>0 || consult[2].length>0">下级部门</li>
 			</ul>
-			<div v-for="(item,index) in datalist" v-if="viewindex==index">
+			<div v-if="viewindex==0">
 				<div class="overview">
 					<h3><span class="fa fa-calendar"></span>任务统计</h3>
-					<div class="inside" v-if="task['0']">
+					<div class="inside" v-if="task[0].length">
 						<div class="part show1">
-							<span title="首次完成率=无退回完成的任务数/完成的任务总数"> 首次完成率 <strong>{{task[item.pid].first}}</strong></span>
-							<span title="提交率=已提交待审核的任务数/进行中的任务总数"> 提交率 <strong>{{task[item.pid].reply}}</strong></span>
+							<span title="首次完成率=无退回完成的任务数/完成的任务总数"> 首次完成率 <strong>{{task[0][0].first}}</strong></span>
+							<span title="提交率=已提交待审核的任务数/进行中的任务总数"> 提交率 <strong>{{task[0][0].reply}}</strong></span>
 						</div>
 						<div class="part">
-							<span class="all">任务总数 <strong class="rexTip">{{task[item.pid].total}}</strong></span>
-							<span class="now">进行中 <strong class="rexTip">{{task[item.pid].doing}}</strong></span>
-							<span class="timeout">超时 <strong class="rexTip">{{task[item.pid].timeout}}</strong></span>
-							<span class="remove">已撤销 <strong class="rexTip">{{task[item.pid].repeal}}</strong></span>
+							<span class="all">任务总数 <strong class="rexTip">{{task[0][0].total}}</strong></span>
+							<span class="now">进行中 <strong class="rexTip">{{task[0][0].doing}}</strong></span>
+							<span class="timeout">超时 <strong class="rexTip">{{task[0][0].timeout}}</strong></span>
+							<span class="remove">已撤销 <strong class="rexTip">{{task[0][0].repeal}}</strong></span>
 						</div>
 					</div>
 				</div>
 				<div class="overview style">
 					<h3><span class="fa fa-paste"></span>请示统计</h3>
-					<div class="inside"  v-if="consult['0']">
+					<div class="inside"  v-if="consult[0].length">
 						<div class="part">
-							<span class="all">请示总数 <strong class="rexTip all">{{consult[item.pid].total}}</strong></span>
-							<span class="now">进行中 <strong class="rexTip now">{{consult[item.pid].doing}}</strong></span>
-							<span class="remove">已撤销 <strong class="rexTip remove">{{consult[item.pid].repeal}}</strong></span>
+							<span class="all">请示总数 <strong class="rexTip all">{{consult[0][0].total}}</strong></span>
+							<span class="now">进行中 <strong class="rexTip now">{{consult[0][0].doing}}</strong></span>
+							<span class="remove">已撤销 <strong class="rexTip remove">{{consult[0][0].repeal}}</strong></span>
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="itemview" v-if="viewindex>0">
+				<table class="rexTable" v-if="task[0].length">
+					<caption class="captionTitle"><span class="fa fa-calendar"> 任务统计</span></caption>
+					<tr>
+						<th>部门</th>
+						<th>首次完成率</th>
+						<th>提交率</th>
+						<th>总数</th>
+						<th>进行中</th>
+						<th>超时</th>
+						<th>已撤销</th>
+					</tr>
+					<tr v-for="item in task[viewindex]">
+						<td>{{item.pname}}</td>
+						<td>{{item.first}}</td>
+						<td>{{item.reply}}</td>
+						<td>{{item.total}}</td>
+						<td>{{item.doing}}</td>
+						<td>{{item.timeout}}</td>
+						<td>{{item.repeal}}</td>
+					</tr>
+				</table>
+				
+				<table class="rexTable" v-if="consult[0].length">
+					<caption class="captionTitle"><span class="fa fa-paste"> 请示统计</span></caption>
+					<tr>
+						<th>部门</th>
+						<th>总数</th>
+						<th>进行中</th>
+						<th>已撤销</th>
+					</tr>
+					<tr v-for="item in consult[viewindex]">
+						<td>{{item.pname}}</td>
+						<td>{{item.total}}</td>
+						<td>{{item.doing}}</td>
+						<td>{{item.repeal}}</td>
+					</tr>
+				</table>
 			</div>
 		</div>
 		
@@ -111,6 +154,7 @@ h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; backgr
 		</div>
 	</div>
 	
+	<div id="department" class="dataField"><?php echo json_encode($department); ?></div>
 	<script src="/script/vue-2.5.9.min.js"></script>
 	<script src="/script/jquery-1.12.4.min.js"></script>
 	<script src="/script/relax_function1.1.1.js"></script>
@@ -121,8 +165,9 @@ h3 .fa{ display:inline-block; width:40px; height:40px; border-radius:50%; backgr
 var vu=new Vue({
 	el: "#app",
 	data:{
-		task:{},
-		consult:{},
+		task:[[],[],[]],
+		consult:[[],[],[]],
+		department: JSON.array2Object(JSON.parse($('#department').text()),'pid'),
 		load:false,
 		ajaxtype:'',
 		error:{},
@@ -135,14 +180,10 @@ var vu=new Vue({
 	computed:{
 		datalist: function(){
 			var temp=[];
-			if (this.task['0']){
-				for (var x in this.task){
-					temp.push({pid:x,pname:this.task[x].pname});
-				}
-			}else if (this.consult['0']){
-				for (var x in this.consult){
-					temp.push({pid:x,pname:this.consult[x].pname});
-				}
+			if (this.task[0].length>0){
+				temp=this.task;
+			}else if (this.consult[0].length>0){
+				temp=this.consult;
 			}
 			return temp;
 		}
@@ -175,7 +216,7 @@ var vu=new Vue({
 				if (this.error['consult']){
 					tempMsg=this.error['consult']+'\n'+code+' '+msg;
 				}else{
-					if (!this.consult['0']){
+					if (this.consult[0].length==0){
 						this.getConsult();
 						return;
 					}
@@ -184,7 +225,7 @@ var vu=new Vue({
 				if (this.error['task']){
 					tempMsg=this.error['task']+'\n'+code+' '+msg;
 				}else{
-					if (!this.task['0']){
+					if (this.task[0].length==0){
 						this.getTask();
 						return;
 					}
@@ -199,13 +240,13 @@ var vu=new Vue({
 		AJAXsuccess: function(data){
 			if (this.ajaxtype=='task'){
 				this.task=this._makeTask(data.data);
-				if (!this.error['consult'] && !this.consult['0']){
+				if (!this.error['consult'] && this.consult[0].length==0){
 					this.getConsult();
 					return;
 				}
 			}else{
 				this.consult=this._makeConsult(data.data);
-				if (!this.error['task'] && !this.task['0']){
+				if (!this.error['task'] && this.task[0].length==0){
 					this.getTask();
 					return;
 				}
@@ -215,15 +256,15 @@ var vu=new Vue({
 			this.hideDialog('loading');
 		},
 		getData: function(){
-			if (!this.consult['0']){
+			if (this.consult[0].length==0){
 				this.getConsult();
-			}else if(!this.task['0']){
+			}else if(this.task[0].length==0){
 				this.getTask();
 			}
 		},
 		getAll: function(){
-			this.task={};
-			this.consult={};
+			this.task=[[],[],[]];
+			this.consult=[[],[],[]];
 			this.error={};
 			this.getData();
 		},
@@ -243,8 +284,8 @@ var vu=new Vue({
 		},
 		_makeTask: function(data){
 			var first=data[0].count;
-			var temp={};
-			temp['0']={
+			var temp=[[],[],[]];
+			temp[0].push({
 				pid: 0,
 				pname: '总计',
 				total: first.total,
@@ -253,10 +294,16 @@ var vu=new Vue({
 				timeout: first.timeout,
 				first: first.total-first.doing==0? '--':first.first_finish_percent+'%',
 				reply: first.total-first.repeal==0? '--':first.reply_percent+'%'
-			};
+			});
 			for (var i=1; i<data.length; i++){
+				var tempObj;
 				var temp2=data[i];
-				temp[temp2.pid]={
+				if (this.department[data[i].pid].plevel==1){
+					tempObj=temp[1];
+				}else{
+					tempObj=temp[2];
+				}
+				tempObj.push({
 					pid: temp2.pid,
 					pname: temp2.name,
 					total: temp2.count.total,
@@ -265,30 +312,35 @@ var vu=new Vue({
 					timeout: temp2.count.timeout,
 					first: temp2.count.total-temp2.count.doing==0? '--':temp2.count.first_finish_percent+'%',
 					reply: temp2.count.total-temp2.count.repeal==0? '--':temp2.count.reply_percent+'%'
-				};
+				});
 			}
 			return temp;
 		},
 		_makeConsult: function(data){
-			var temp={};
-			temp['0']={
-				pid:0,
-				pname:'总计',
-				total: data.total,
-				doing: data.total_ongoing,
-				repeal: data.total_revoke
-			}
-			if (data.departments.length>1){
-				for (var i=0; i<data.departments.length; i++){
-					var temp2=data.departments[i];
-					temp[temp2.pid]={
-						pid: temp2.pid,
-						pname: temp2.pname,
-						total: temp2.total_cnt,
-						doing: temp2.ongoing_cnt,
-						repeal: temp2.revoke_cnt
-					};
+			var first=data[0].count;
+			var temp=[[],[],[]];
+			temp[0].push({
+				pid: 0,
+				pname: '总计',
+				total: first.total,
+				doing: first.doing,
+				repeal: first.repeal
+			});
+			for (var i=1; i<data.length; i++){
+				var tempObj;
+				var temp2=data[i];
+				if (this.department[data[i].pid].plevel==1){
+					tempObj=temp[1];
+				}else{
+					tempObj=temp[2];
 				}
+				tempObj.push({
+					pid: temp2.pid,
+					pname: temp2.pname,
+					total: temp2.count.total,
+					doing: temp2.count.doing,
+					repeal: temp2.count.repeal
+				});
 			}
 			return temp;
 		}

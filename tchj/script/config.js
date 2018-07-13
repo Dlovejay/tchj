@@ -43,7 +43,7 @@ var URL={  //本站URL地址
 	consultanswer:'/index.php/consult/replies_consult',  //请示回复
 	consultdel:'/index.php/consult/del_consult',   //删除请示
 	consulteidt:'/index.php/consult/edit_consult', //请示修改
-	consultover:'/index.php/consult/consult_statistics' //请示概览
+	consultover:'/index.php/consult/statistics' //请示概览
 };
 //正则字典
 var REG={

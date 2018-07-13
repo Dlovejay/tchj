@@ -41,6 +41,7 @@ class Task extends MY_Controller{
             'is_timeout' => $this->input->post('is_timeout'),
             'page' => $this->input->post('page'),
             'pagesize' => $this->input->post('pagesize'),
+						'departmentID'=> $this->input->post('departmentID'),
         );
         $this->load->model('TaskModel');
         rexAjaxReturn(0, "", $this->TaskModel->getPageResult($user, $params));

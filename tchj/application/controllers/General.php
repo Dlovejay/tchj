@@ -295,6 +295,9 @@ class General extends MY_Controller{
 	}
 	
 	public function overview(){  //概览
-		$this->load->view('general/overview.php');
+		$this->load->model('Base');
+		$result=$this->Base->department();
+		$data['department']=$result['data'];
+		$this->load->view('general/overview.php',$data);
 	}
 }

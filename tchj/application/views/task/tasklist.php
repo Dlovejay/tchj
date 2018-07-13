@@ -353,6 +353,14 @@
 								<input type="text" class="rexInput" v-model.trim="real.keywords" v-bind:class="{'warning':chk[1].obj=='keywords'}" v-bind:disabled="this.load.op"/>
 							</span>
 						</li>
+						<li class="formpart" v-if="filterDPMT.length">
+							<label class="rexLabel">指派给</label><span>
+								<select class="rexSelect" v-model="real.departmentID">
+									<option value=""></option>
+									<option v-for="item in filterDPMT" v-bind:value="item.pid">{{item.pname}}</option>
+								</select>
+							</span>
+						</li>
 						<li class="formpart">
 							<label class="rexLabel">状&emsp;态</label><span>
 								<select class="rexSelect" v-model="real.status" v-bind:disabled="this.load.op">

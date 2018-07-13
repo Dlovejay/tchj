@@ -1,6 +1,7 @@
 <?php
 class ConsultList extends CI_Model
 {
+		private $dpt;
     public function __construct()
     {
         parent::__construct();
@@ -121,6 +122,78 @@ class ConsultList extends CI_Model
 
         return $return;
     }
+		
+		//统计2
+		public function GetStatistics($user,$departments){
+			$this->dpt=$departments;
+			switch($user['tid']){
+				case USERM:
+					$sql='SELECT id,status,pid,created_pid FROM consultlist';
+					$find=$this->getLevelDepartment(array());
+					break;
+				case USERL:
+					$sql='SELECT id,status,pid,created_pid FROM consultlist';
+					$find=$this->getLevelDepartment(array(1,2));
+					break;
+				case USERU:
+					$sql='SELECT id,status,pid,created_pid FROM consultlist WHERE pid='. $user['pid'];
+					$find=$this->getLevelDepartment(array(2));
+					break;
+				case USERD:
+					$sql='SELECT id,status,pid,created_pid FROM consultlist WHERE created_pid='. $user['pid'];
+					$find=$this->getLevelDepartment(array());
+					break;
+			}
+			array_unshift($find,array('pid'=>0,'level'=>0,'name'=>'全部'));
+			$result=$this->db->query($sql)->result_array();
+			return $this->getMainStats($find,$result);
+		}
+		
+		//获得对应level的部门编号
+		private function getLevelDepartment($level){
+			$return=array();
+			for ($i=0; $i<count($level); $i++){
+				$nowLevel=$level[$i];
+				for ($j=0; $j<count($this->dpt); $j++){
+					if ($this->dpt[$j]['plevel']==$nowLevel) $return[]=array('pid'=>$this->dpt[$j]['pid'],'level'=>$nowLevel,'name'=>$this->dpt[$j]['pname']);
+				}
+			}
+			return $return;
+		}
+		
+		private function getMainStats($find,$result){
+			$data=array();
+			for ($i=0; $i<count($find); $i++){
+				$data[]=array('pid'=>$find[$i]['pid'],'pname'=>$find[$i]['name'],'count'=>array('total'=>0,'doing'=>0,'repeal'=>0));
+			}
+			for ($i=0; $i<count($result); $i++){
+				for ($j=0; $j<count($find); $j++){
+					if ($find[$j]['pid']==0){
+						$this->doCount($result[$i],$data[$j]);
+					}else{
+						if ($find[$j]['level']==1){
+							if ($result[$i]['pid']==$find[$j]['pid']){
+								$this->doCount($result[$i],$data[$j]);
+							}
+						}else{
+							if ($result[$i]['created_pid']==$find[$j]['pid']){
+								$this->doCount($result[$i],$data[$j]);
+							}
+						}
+					}
+				}
+			}
+			return $data;
+		}
+		
+		private function doCount(&$result,&$data){
+			$data['count']['total']++;
+			if ($result['status']<2){
+				$data['count']['doing']++;
+			}else if ($result['status']==3){
+				$data['count']['repeal']++;
+			}
+		}
 }
 
 ?>

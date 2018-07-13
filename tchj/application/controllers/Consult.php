@@ -401,4 +401,13 @@ class Consult extends MY_Controller
         echo json_encode($return);
         exit;
     }
+		
+		public function statistics(){
+				$this->load->model('Base');
+				$temp=$this->Base->department();
+				$departments=$temp['data'];
+        $user = $_SESSION['user'];
+        $this->load->model('ConsultList');
+        rexAjaxReturn(0, '', $this->ConsultList->GetStatistics($user,$departments));
+    }
 }
